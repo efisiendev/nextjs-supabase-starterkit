@@ -46,6 +46,7 @@ const config: Config = {
         'fade-in': 'fadeIn 0.5s ease-in-out',
         'slide-up': 'slideUp 0.5s ease-out',
         'slide-down': 'slideDown 0.5s ease-out',
+        'ping-slow': 'pingSlow 3s cubic-bezier(0, 0, 0.2, 1) infinite',
       },
       keyframes: {
         fadeIn: {
@@ -59,6 +60,12 @@ const config: Config = {
         slideDown: {
           '0%': { transform: 'translateY(-20px)', opacity: '0' },
           '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        pingSlow: {
+          '75%, 100%': {
+            transform: 'scale(1.3)',
+            opacity: '0',
+          },
         },
       },
     },

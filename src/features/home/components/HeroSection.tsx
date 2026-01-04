@@ -31,32 +31,10 @@ export function HeroSection() {
 
   return (
     <section className="relative bg-gradient-to-br from-primary-50 via-white to-secondary-50 py-20 md:py-28 overflow-hidden">
-      {/* Animated background elements */}
+      {/* Static background elements - optimized */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/30 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [90, 0, 90],
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-200/30 rounded-full blur-3xl"
-        />
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-200/30 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-secondary-200/30 rounded-full blur-3xl" />
       </div>
 
       <div className="container-custom relative z-10">
@@ -127,52 +105,22 @@ export function HeroSection() {
               whileHover={{ scale: 1.02 }}
               className="relative h-96 lg:h-[500px] bg-gradient-to-br from-primary-200 to-secondary-200 rounded-3xl overflow-hidden shadow-2xl"
             >
-              {/* Animated gradient overlay */}
-              <motion.div
-                animate={{
-                  background: [
-                    'linear-gradient(45deg, rgba(34, 197, 94, 0.3), rgba(245, 158, 11, 0.3))',
-                    'linear-gradient(135deg, rgba(245, 158, 11, 0.3), rgba(34, 197, 94, 0.3))',
-                    'linear-gradient(225deg, rgba(34, 197, 94, 0.3), rgba(245, 158, 11, 0.3))',
-                    'linear-gradient(315deg, rgba(245, 158, 11, 0.3), rgba(34, 197, 94, 0.3))',
-                    'linear-gradient(45deg, rgba(34, 197, 94, 0.3), rgba(245, 158, 11, 0.3))',
-                  ]
-                }}
-                transition={{ duration: 10, repeat: Infinity }}
-                className="absolute inset-0"
-              />
+              {/* Static gradient overlay - optimized */}
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-300/30 to-secondary-300/30" />
 
               {/* Placeholder content */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <motion.div
-                  animate={{ y: [0, -10, 0] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="text-center text-white"
-                >
+                <div className="text-center text-white">
                   <Leaf className="w-24 h-24 mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium">Hero Image</p>
                   <p className="text-sm opacity-75">Tambahkan foto kebun di sini</p>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
 
-            {/* Floating elements with animation */}
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.3, 0.5, 0.3],
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -bottom-6 -left-6 w-32 h-32 bg-secondary-400 rounded-full blur-3xl"
-            />
-            <motion.div
-              animate={{
-                scale: [1.2, 1, 1.2],
-                opacity: [0.5, 0.3, 0.5],
-              }}
-              transition={{ duration: 5, repeat: Infinity }}
-              className="absolute -top-6 -right-6 w-32 h-32 bg-primary-400 rounded-full blur-3xl"
-            />
+            {/* Static floating elements - optimized */}
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-secondary-400/40 rounded-full blur-3xl" />
+            <div className="absolute -top-6 -right-6 w-32 h-32 bg-primary-400/40 rounded-full blur-3xl" />
           </motion.div>
         </div>
       </div>

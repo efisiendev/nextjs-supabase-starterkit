@@ -97,24 +97,10 @@ function Counter({ value, suffix }: { value: number; suffix: string }) {
 export function StatsSection() {
   return (
     <section className="relative py-24 overflow-hidden bg-gradient-to-b from-gray-50 to-white">
-      {/* Animated background elements */}
+      {/* Static background elements - no animation to save memory */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            rotate: [0, 90, 0],
-          }}
-          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-          className="absolute -top-20 -left-20 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            scale: [1.2, 1, 1.2],
-            rotate: [90, 0, 90],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
-          className="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary-200/20 rounded-full blur-3xl"
-        />
+        <div className="absolute -top-20 -left-20 w-96 h-96 bg-primary-200/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 w-96 h-96 bg-secondary-200/20 rounded-full blur-3xl" />
       </div>
 
       <div className="container-custom relative z-10">

@@ -56,34 +56,10 @@ export function WhatsAppButton() {
       </AnimatePresence>
 
       {/* Main Button */}
-      <motion.div className="relative">
-        {/* Pulse rings */}
-        <div className="absolute inset-0">
-          <motion.div
-            animate={{
-              scale: [1, 1.4, 1],
-              opacity: [0.5, 0, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-            }}
-            className="absolute inset-0 bg-green-500 rounded-full"
-          />
-          <motion.div
-            animate={{
-              scale: [1, 1.6, 1],
-              opacity: [0.3, 0, 0.3],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: 'easeInOut',
-              delay: 0.3,
-            }}
-            className="absolute inset-0 bg-green-500 rounded-full"
-          />
+      <div className="relative">
+        {/* Single pulse ring - optimized */}
+        <div className="absolute inset-0 animate-ping-slow">
+          <div className="absolute inset-0 bg-green-500 rounded-full opacity-30" />
         </div>
 
         {/* Button */}
@@ -95,27 +71,14 @@ export function WhatsAppButton() {
           className="relative w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 group"
           aria-label="Chat via WhatsApp"
         >
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 3 }}
-          >
-            <MessageCircle className="w-8 h-8" />
-          </motion.div>
+          <MessageCircle className="w-8 h-8" />
 
           {/* Notification badge */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center"
-          >
-            <motion.div
-              animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 1, repeat: Infinity }}
-              className="w-2 h-2 bg-white rounded-full"
-            />
-          </motion.div>
+          <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full border-2 border-white flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
+          </div>
         </motion.button>
-      </motion.div>
+      </div>
     </div>
   );
 }

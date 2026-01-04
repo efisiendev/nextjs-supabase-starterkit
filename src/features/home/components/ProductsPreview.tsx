@@ -119,29 +119,17 @@ export function ProductsPreview() {
                     >
                       {/* Image Section */}
                       <div className="relative h-56 bg-gradient-to-br from-primary-50 via-white to-secondary-50 overflow-hidden">
-                        {/* Animated background pattern */}
-                        <motion.div
-                          animate={{
-                            scale: [1, 1.2, 1],
-                            rotate: [0, 90, 0],
-                          }}
-                          transition={{ duration: 20, repeat: Infinity }}
-                          className="absolute inset-0 opacity-10"
-                        >
+                        {/* Static background pattern - optimized */}
+                        <div className="absolute inset-0 opacity-10">
                           <div className="w-full h-full" style={{
                             backgroundImage: `radial-gradient(circle, ${product.category === 'fruits' ? '#f87171' : product.category === 'vegetables' ? '#4ade80' : product.category === 'flowers' ? '#f472b6' : '#fbbf24'} 1px, transparent 1px)`,
                             backgroundSize: '20px 20px',
                           }} />
-                        </motion.div>
+                        </div>
 
                         {/* Icon */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <motion.div
-                            whileHover={{ rotate: [0, -10, 10, -10, 0], scale: 1.1 }}
-                            transition={{ duration: 0.5 }}
-                          >
-                            <ShoppingBag className="w-20 h-20 text-primary-300 group-hover:text-primary-400 transition-colors" />
-                          </motion.div>
+                          <ShoppingBag className="w-20 h-20 text-primary-300 group-hover:text-primary-400 group-hover:scale-110 transition-all duration-300" />
                         </div>
 
                         {/* Status Badge */}
@@ -151,14 +139,10 @@ export function ProductsPreview() {
                               Habis
                             </div>
                           ) : (
-                            <motion.div
-                              animate={{ scale: [1, 1.05, 1] }}
-                              transition={{ duration: 2, repeat: Infinity }}
-                              className="bg-primary-600/90 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg flex items-center gap-1"
-                            >
+                            <div className="bg-primary-600/90 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg flex items-center gap-1">
                               <div className="w-2 h-2 bg-white rounded-full animate-pulse" />
                               Tersedia
-                            </motion.div>
+                            </div>
                           )}
                         </div>
 
