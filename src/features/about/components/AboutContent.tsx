@@ -137,7 +137,7 @@ export function AboutContent() {
             {/* Statistics - Bold Numbers */}
             <Section className="py-24 bg-primary-50">
                 <div className="container-custom">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
                         {Object.entries(aboutData.statistics).map(([key, value]) => (
                             <div key={key} className="text-center">
                                 <div className="text-4xl md:text-6xl font-black text-gray-900 mb-2 tracking-tighter">

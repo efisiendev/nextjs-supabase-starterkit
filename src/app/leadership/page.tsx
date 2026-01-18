@@ -79,7 +79,7 @@ export default function LeadershipPage() {
             initial={{ opacity: 0, scale: 0.9, letterSpacing: '0em' }}
             animate={{ opacity: 1, scale: 1, letterSpacing: '-0.02em' }}
             transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
-            className="text-7xl md:text-9xl font-black uppercase tracking-tighter mb-6"
+            className="text-5xl sm:text-7xl md:text-9xl font-black uppercase tracking-tighter mb-6"
           >
             Leadership
           </motion.h1>
@@ -87,7 +87,7 @@ export default function LeadershipPage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
-            className="text-xl md:text-2xl text-gray-400 max-w-2xl mx-auto font-light tracking-wide"
+            className="text-lg md:text-2xl text-gray-400 max-w-2xl mx-auto font-light tracking-wide px-4"
           >
             The visionaries behind the movement.
           </motion.p>
@@ -95,7 +95,7 @@ export default function LeadershipPage() {
       </section>
 
       {/* Core Team - Editorial Posters (Floating Images) */}
-      <section className="bg-black py-32 text-white relative z-20">
+      <section className="bg-black py-20 md:py-32 text-white relative z-20">
         <div className="container-custom">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-8">
             {coreLeadership.map((member, index) => (
@@ -133,12 +133,12 @@ export default function LeadershipPage() {
       </section>
 
       {/* Division Leadership - Editorial List (Non-Grid) */}
-      <section className="bg-white py-32">
+      <section className="bg-white py-20 md:py-32">
         <div className="container-custom">
           {Object.entries(groupedByDivision).map(([division, members]) => (
             <motion.div
               key={division}
-              className="mb-32 last:mb-0"
+              className="mb-24 md:mb-32 last:mb-0"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
@@ -146,7 +146,7 @@ export default function LeadershipPage() {
             >
               {/* Division Header - Big Typography */}
               <div className="flex flex-col md:flex-row md:items-end justify-between border-b-4 border-black pb-6 mb-12">
-                <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter text-black leading-none">
+                <h2 className="text-3xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter text-black leading-none mb-4 md:mb-0">
                   {DIVISIONS[division as keyof typeof DIVISIONS]}
                 </h2>
                 <span className="text-2xl font-bold font-mono text-gray-300 mt-4 md:mt-0">
