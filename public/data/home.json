@@ -35,25 +35,25 @@
         "icon": "GraduationCap",
         "title": "Pengembangan Akademik",
         "description": "Kajian ilmiah, seminar, dan workshop kefarmasian untuk meningkatkan kompetensi",
-        "color": "text-blue-600 bg-blue-100"
+        "color": "text-primary-700 bg-primary-50"
       },
       {
         "icon": "Users",
         "title": "Kepemimpinan",
         "description": "Membentuk jiwa kepemimpinan melalui berbagai program organisasi",
-        "color": "text-purple-600 bg-purple-100"
+        "color": "text-primary-700 bg-primary-50"
       },
       {
         "icon": "Heart",
         "title": "Pengabdian Masyarakat",
         "description": "Bakti sosial dan edukasi kesehatan untuk kontribusi nyata bagi masyarakat",
-        "color": "text-red-600 bg-red-100"
+        "color": "text-primary-700 bg-primary-50"
       },
       {
         "icon": "Sparkles",
         "title": "Networking",
         "description": "Membangun koneksi dengan mahasiswa farmasi se-Indonesia dan praktisi",
-        "color": "text-green-600 bg-green-100"
+        "color": "text-primary-700 bg-primary-50"
       }
     ]
   },

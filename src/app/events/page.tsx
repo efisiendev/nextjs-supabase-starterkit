@@ -49,40 +49,31 @@ export default async function EventsPage({
         </div>
       </section>
 
-      {/* Status Filter - Floating Pills */}
-      <section className="sticky top-16 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
-        <div className="container-custom py-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      {/* Status Filter - Segmented Control - Floating Style */}
+      <section className="sticky top-0 md:top-32 z-40 py-4 transition-all duration-300 pointer-events-none">
+        <div className="container-custom flex justify-center pointer-events-auto">
+          <div className="inline-flex items-center p-1.5 bg-gray-100/80 rounded-full border border-gray-200 shadow-inner overflow-x-auto max-w-full scrollbar-hide">
             <Link
               href="/events"
-              className={`px-6 py-3 rounded-full font-semibold whitespace-nowrap transition-all ${
-                !status
-                  ? 'bg-gray-900 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
+              className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${!status
+                ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                : 'text-gray-500 hover:text-gray-900'
+                }`}
             >
               Semua Event
             </Link>
-            <Link
-              href="/events?status=upcoming"
-              className={`px-6 py-3 rounded-full font-semibold whitespace-nowrap transition-all ${
-                status === 'upcoming'
-                  ? 'bg-gray-900 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Akan Datang
-            </Link>
-            <Link
-              href="/events?status=completed"
-              className={`px-6 py-3 rounded-full font-semibold whitespace-nowrap transition-all ${
-                status === 'completed'
-                  ? 'bg-gray-900 text-white shadow-lg'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Selesai
-            </Link>
+            {Object.entries(statusLabels).map(([key, label]) => (
+              <Link
+                key={key}
+                href={`/events?status=${key}`}
+                className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${status === key
+                  ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
+                  : 'text-gray-500 hover:text-gray-900'
+                  }`}
+              >
+                {label}
+              </Link>
+            ))}
           </div>
         </div>
       </section>

@@ -214,5 +214,197 @@
       "end": "2026-01-14"
     },
     "order": 12
+  },
+  {
+    "id": "13",
+    "name": "Rina Wati",
+    "position": "member",
+    "division": "internal-affairs",
+    "photo": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 13
+  },
+  {
+    "id": "14",
+    "name": "Budi Santoso",
+    "position": "member",
+    "division": "internal-affairs",
+    "photo": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 14
+  },
+  {
+    "id": "15",
+    "name": "Citra Lestari",
+    "position": "member",
+    "division": "external-affairs",
+    "photo": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 15
+  },
+  {
+    "id": "16",
+    "name": "Doni Kurniawan",
+    "position": "member",
+    "division": "external-affairs",
+    "photo": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 16
+  },
+  {
+    "id": "17",
+    "name": "Eka Putri",
+    "position": "member",
+    "division": "academic",
+    "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 17
+  },
+  {
+    "id": "18",
+    "name": "Fajar Sidiq",
+    "position": "member",
+    "division": "academic",
+    "photo": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 18
+  },
+  {
+    "id": "19",
+    "name": "Gita Pertiwi",
+    "position": "member",
+    "division": "student-development",
+    "photo": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 19
+  },
+  {
+    "id": "20",
+    "name": "Hadi Wijaya",
+    "position": "member",
+    "division": "student-development",
+    "photo": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 20
+  },
+  {
+    "id": "21",
+    "name": "Indah Sari",
+    "position": "member",
+    "division": "entrepreneurship",
+    "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 21
+  },
+  {
+    "id": "22",
+    "name": "Joko Susilo",
+    "position": "member",
+    "division": "entrepreneurship",
+    "photo": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 22
+  },
+  {
+    "id": "23",
+    "name": "Kartika Dewi",
+    "position": "member",
+    "division": "media-information",
+    "photo": "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 23
+  },
+  {
+    "id": "24",
+    "name": "Lukman Hakim",
+    "position": "member",
+    "division": "media-information",
+    "photo": "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 24
+  },
+  {
+    "id": "25",
+    "name": "Maya Anggraini",
+    "position": "member",
+    "division": "sports-arts",
+    "photo": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 25
+  },
+  {
+    "id": "26",
+    "name": "Niko Saputra",
+    "position": "member",
+    "division": "sports-arts",
+    "photo": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 26
+  },
+  {
+    "id": "27",
+    "name": "Olivia Putri",
+    "position": "member",
+    "division": "islamic-spirituality",
+    "photo": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 27
+  },
+  {
+    "id": "28",
+    "name": "Putra Pratama",
+    "position": "member",
+    "division": "islamic-spirituality",
+    "photo": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400",
+    "period": {
+      "start": "2025-01-15",
+      "end": "2026-01-14"
+    },
+    "order": 28
   }
 ]
