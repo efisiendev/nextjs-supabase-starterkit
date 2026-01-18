@@ -1,15 +1,14 @@
-import { Metadata } from 'next';
+'use client';
+
 import Image from 'next/image';
 import { JsonLeadershipRepository } from '@/infrastructure/repositories/JsonLeadershipRepository';
 import { DIVISIONS } from '@/lib/constants';
-import { Mail, Phone, Instagram, Linkedin } from 'lucide-react';
+import { Mail } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import type { LeadershipMember } from '@/core/entities/Leadership';
 
-export const metadata: Metadata = {
-  title: 'Kepengurusan - HMJF UIN Alauddin',
-  description: 'Struktur kepengurusan Himpunan Mahasiswa Jurusan Farmasi UIN Alauddin Makassar',
-};
-
-const positionLabels = {
+const positionLabels: Record<string, string> = {
   'ketua': 'Ketua',
   'wakil-ketua': 'Wakil Ketua',
   'sekretaris': 'Sekretaris',
@@ -18,19 +17,42 @@ const positionLabels = {
   'member': 'Anggota',
 };
 
-export default async function LeadershipPage() {
-  const leadershipRepo = new JsonLeadershipRepository();
-  const coreLeadership = await leadershipRepo.getCore();
-  const allLeadership = await leadershipRepo.getAll();
+export default function LeadershipPage() {
+  const [coreLeadership, setCoreLeadership] = useState<LeadershipMember[]>([]);
+  const [groupedByDivision, setGroupedByDivision] = useState<Record<string, LeadershipMember[]>>({});
+  const [loading, setLoading] = useState(true);
 
-  // Group by division
-  const divisionLeadership = allLeadership.filter((member) => member.division);
-  const groupedByDivision = divisionLeadership.reduce((acc, member) => {
-    const div = member.division!;
-    if (!acc[div]) acc[div] = [];
-    acc[div].push(member);
-    return acc;
-  }, {} as Record<string, typeof divisionLeadership>);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const leadershipRepo = new JsonLeadershipRepository();
+        const core = await leadershipRepo.getCore();
+        const all = await leadershipRepo.getAll();
+
+        // Group by division
+        const divisionLeadership = all.filter((member) => member.division);
+        const grouped = divisionLeadership.reduce((acc, member) => {
+          const div = member.division!;
+          if (!acc[div]) acc[div] = [];
+          acc[div].push(member);
+          return acc;
+        }, {} as Record<string, LeadershipMember[]>);
+
+        setCoreLeadership(core);
+        setGroupedByDivision(grouped);
+      } catch (error) {
+        console.error('Failed to fetch leadership:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -55,16 +77,30 @@ export default async function LeadershipPage() {
           </h2>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {coreLeadership.map((member) => (
-            <div key={member.id} className="group">
+          {coreLeadership.map((member, index) => (
+            <motion.div
+              key={member.id}
+              initial={{ opacity: 0, y: 50, scale: 0.9 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{
+                delay: index * 0.15,
+                duration: 0.6,
+                ease: [0.21, 0.47, 0.32, 0.98],
+              }}
+              whileHover={{ y: -8 }}
+              className="group"
+            >
               {/* Image - minimal frame */}
               <div className="relative aspect-[3/4] overflow-hidden rounded-3xl mb-6 bg-gradient-to-br from-primary-100/50 to-gray-100/50">
-                <Image
-                  src={member.photo}
-                  alt={member.name}
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
-                />
+                <motion.div whileHover={{ scale: 1.1 }} transition={{ duration: 0.5 }}>
+                  <Image
+                    src={member.photo}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                  />
+                </motion.div>
               </div>
               {/* Info - clean typography */}
               <div className="text-center">
@@ -80,7 +116,7 @@ export default async function LeadershipPage() {
                   </a>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </section>

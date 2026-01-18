@@ -1,33 +1,54 @@
-import { Metadata } from 'next';
+'use client';
+
 import Image from 'next/image';
-import { JsonMemberRepository } from '@/infrastructure/repositories/JsonMemberRepository';
 import { User } from 'lucide-react';
+import { JsonMemberRepository } from '@/infrastructure/repositories/JsonMemberRepository';
+import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
+import type { Member } from '@/core/entities/Member';
 
-export const metadata: Metadata = {
-  title: 'Anggota - HMJF UIN Alauddin',
-  description: 'Daftar anggota Himpunan Mahasiswa Jurusan Farmasi UIN Alauddin Makassar',
-};
-
-export default async function MembersPage({
+export default function MembersPage({
   searchParams,
 }: {
   searchParams: { batch?: string; division?: string };
 }) {
-  const memberRepo = new JsonMemberRepository();
+  const [members, setMembers] = useState<Member[]>([]);
+  const [batches, setBatches] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   const { batch, division } = searchParams;
 
-  let members = await memberRepo.getByStatus('active');
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const memberRepo = new JsonMemberRepository();
+        let fetchedMembers = await memberRepo.getByStatus('active');
 
-  if (batch) {
-    members = members.filter((m) => m.batch === batch);
-  }
-  if (division) {
-    members = members.filter((m) => m.division === division);
-  }
+        if (batch) {
+          fetchedMembers = fetchedMembers.filter((m) => m.batch === batch);
+        }
+        if (division) {
+          fetchedMembers = fetchedMembers.filter((m) => m.division === division);
+        }
 
-  // Get unique batches
-  const allMembers = await memberRepo.getAll();
-  const batches = [...new Set(allMembers.map((m) => m.batch))].sort().reverse();
+        // Get unique batches
+        const allMembers = await memberRepo.getAll();
+        const uniqueBatches = [...new Set(allMembers.map((m) => m.batch))].sort().reverse();
+
+        setMembers(fetchedMembers);
+        setBatches(uniqueBatches);
+      } catch (error) {
+        console.error('Failed to fetch members:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [batch, division]);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -75,13 +96,19 @@ export default async function MembersPage({
         </div>
       </section>
 
-      {/* Members Grid - Modern Layout */}
+      {/* Members Grid - Animated */}
       <section className="container-custom py-16">
-        <div className="mb-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="mb-12"
+        >
           <p className="text-xl text-gray-600">
             Menampilkan <span className="text-3xl font-bold text-gray-900">{members.length}</span> anggota
           </p>
-        </div>
+        </motion.div>
 
         {members.length === 0 ? (
           <div className="text-center py-32">
@@ -89,19 +116,45 @@ export default async function MembersPage({
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-6">
-            {members.map((member) => (
-              <div key={member.id} className="group">
+            {members.map((member, index) => (
+              <motion.div
+                key={member.id}
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{
+                  delay: index * 0.05,
+                  duration: 0.6,
+                  ease: [0.21, 0.47, 0.32, 0.98],
+                }}
+                whileHover={{
+                  y: -8,
+                  transition: { duration: 0.3 },
+                }}
+                className="group"
+              >
                 {/* Photo - minimal frame */}
                 <div className="relative aspect-[3/4] overflow-hidden rounded-3xl mb-4 bg-gradient-to-br from-primary-100/50 to-gray-100/50 flex items-center justify-center">
                   {member.photo ? (
-                    <Image
-                      src={member.photo}
-                      alt={member.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      transition={{ duration: 0.5 }}
+                      className="w-full h-full"
+                    >
+                      <Image
+                        src={member.photo}
+                        alt={member.name}
+                        fill
+                        className="object-cover"
+                      />
+                    </motion.div>
                   ) : (
-                    <User className="w-16 h-16 text-primary-300" />
+                    <motion.div
+                      whileHover={{ rotate: 360, scale: 1.2 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <User className="w-16 h-16 text-primary-300" />
+                    </motion.div>
                   )}
                 </div>
                 {/* Info - clean typography */}
@@ -116,7 +169,7 @@ export default async function MembersPage({
                     <p className="text-xs text-gray-700 font-semibold mt-1 line-clamp-1">{member.position}</p>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
