@@ -4,10 +4,14 @@
 
 import { Member, MemberListItem, MemberStatus } from '@/core/entities/Member';
 import { IMemberRepository } from '@/core/repositories/IMemberRepository';
+import { SITE_CONFIG } from '@/lib/constants';
 
 export class JsonMemberRepository implements IMemberRepository {
   private async fetchMembers(): Promise<Member[]> {
-    const response = await fetch('/data/members.json');
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.url;
+    const response = await fetch(`${baseUrl}/data/members.json`, {
+      cache: 'no-store',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch members');
     }

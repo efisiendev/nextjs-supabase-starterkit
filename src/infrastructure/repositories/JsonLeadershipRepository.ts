@@ -4,10 +4,14 @@
 
 import { Leadership, LeadershipListItem, Division, LeadershipPosition } from '@/core/entities/Leadership';
 import { ILeadershipRepository } from '@/core/repositories/ILeadershipRepository';
+import { SITE_CONFIG } from '@/lib/constants';
 
 export class JsonLeadershipRepository implements ILeadershipRepository {
   private async fetchLeadership(): Promise<Leadership[]> {
-    const response = await fetch('/data/leadership.json');
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.url;
+    const response = await fetch(`${baseUrl}/data/leadership.json`, {
+      cache: 'no-store',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch leadership');
     }

@@ -18,8 +18,11 @@ interface MobileMenuProps {
 
 const navItems = [
   { label: 'Beranda', href: ROUTES.home },
-  { label: 'Tentang Kami', href: ROUTES.about },
-  { label: 'Galeri', href: ROUTES.gallery },
+  { label: 'Tentang', href: ROUTES.about },
+  { label: 'Artikel', href: ROUTES.articles },
+  { label: 'Event', href: ROUTES.events },
+  { label: 'Kepengurusan', href: ROUTES.leadership },
+  { label: 'Anggota', href: ROUTES.members },
 ];
 
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {

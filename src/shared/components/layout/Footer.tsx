@@ -40,8 +40,10 @@ export function Footer() {
 
   const quickLinks = [
     { label: 'Beranda', href: ROUTES.home },
-    { label: 'Tentang Kami', href: ROUTES.about },
-    { label: 'Galeri', href: ROUTES.gallery },
+    { label: 'Tentang', href: ROUTES.about },
+    { label: 'Artikel', href: ROUTES.articles },
+    { label: 'Event', href: ROUTES.events },
+    { label: 'Kepengurusan', href: ROUTES.leadership },
   ];
 
   return (
@@ -72,13 +74,13 @@ export function Footer() {
               </div>
               <div>
                 <h3 className="text-white font-bold text-xl">{SITE_CONFIG.name}</h3>
-                <p className="text-xs text-primary-400">Organic Agrotourism</p>
+                <p className="text-xs text-primary-400">Student Organization</p>
               </div>
             </div>
 
             <p className="text-sm leading-relaxed mb-6 text-gray-400">
-              Agrowisata organik dengan buah-buahan, sayuran, dan bunga segar.
-              Nikmati pengalaman bertani yang menyenangkan dan edukatif bersama keluarga.
+              Himpunan Mahasiswa Jurusan Farmasi UIN Alauddin Makassar -
+              Wadah organisasi mahasiswa farmasi untuk pengembangan akademik, soft skills, dan pengabdian masyarakat.
             </p>
 
             {/* Social Links */}
@@ -150,7 +152,7 @@ export function Footer() {
                     <MapPin className="w-4 h-4 text-primary-400" />
                   </div>
                   <span className="text-gray-400 leading-relaxed">
-                    Jl. Agrowisata No. 123, Babulu, Indonesia
+                    {SITE_CONFIG.address}
                   </span>
                 </div>
               </li>
@@ -169,14 +171,14 @@ export function Footer() {
               </li>
               <li>
                 <a
-                  href="mailto:info@griyaflorababulu.com"
+                  href={`mailto:${SITE_CONFIG.email}`}
                   className="group flex items-center gap-3 p-3 rounded-xl hover:bg-gray-800/50 transition-all duration-200"
                 >
                   <div className="w-9 h-9 rounded-lg bg-gray-800 flex items-center justify-center flex-shrink-0 group-hover:bg-primary-600/20 transition-colors">
                     <Mail className="w-4 h-4 text-primary-400" />
                   </div>
                   <span className="text-gray-400 group-hover:text-primary-400 transition-colors">
-                    info@griyaflorababulu.com
+                    {SITE_CONFIG.email}
                   </span>
                 </a>
               </li>
@@ -197,7 +199,7 @@ export function Footer() {
               &copy; {currentYear} {SITE_CONFIG.name}. All rights reserved.
             </p>
             <p className="flex items-center gap-2">
-              Made with <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" /> for sustainable farming
+              Made with <Heart className="w-4 h-4 text-red-500 fill-red-500 animate-pulse" /> for pharmacy students
             </p>
           </div>
         </motion.div>

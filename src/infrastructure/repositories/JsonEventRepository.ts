@@ -4,10 +4,14 @@
 
 import { Event, EventListItem, EventStatus, EventCategory } from '@/core/entities/Event';
 import { IEventRepository } from '@/core/repositories/IEventRepository';
+import { SITE_CONFIG } from '@/lib/constants';
 
 export class JsonEventRepository implements IEventRepository {
   private async fetchEvents(): Promise<Event[]> {
-    const response = await fetch('/data/events.json');
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.url;
+    const response = await fetch(`${baseUrl}/data/events.json`, {
+      cache: 'no-store',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch events');
     }

@@ -4,10 +4,14 @@
 
 import { Article, ArticleListItem, ArticleCategory } from '@/core/entities/Article';
 import { IArticleRepository } from '@/core/repositories/IArticleRepository';
+import { SITE_CONFIG } from '@/lib/constants';
 
 export class JsonArticleRepository implements IArticleRepository {
   private async fetchArticles(): Promise<Article[]> {
-    const response = await fetch('/data/articles.json');
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || SITE_CONFIG.url;
+    const response = await fetch(`${baseUrl}/data/articles.json`, {
+      cache: 'no-store',
+    });
     if (!response.ok) {
       throw new Error('Failed to fetch articles');
     }
