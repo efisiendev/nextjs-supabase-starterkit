@@ -1,11 +1,11 @@
 'use client';
-import Link from 'next/link';
 import Image from 'next/image';
 import { User } from 'lucide-react';
 import { JsonMemberRepository } from '@/infrastructure/repositories/JsonMemberRepository';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import type { Member, MemberListItem } from '@/core/entities/Member';
+import type { MemberListItem } from '@/core/entities/Member';
+import { SegmentedControl } from '@/shared/components/ui/SegmentedControl';
 
 export default function MembersPage({
   searchParams,
@@ -66,33 +66,16 @@ export default function MembersPage({
       </section>
 
       {/* Filters - Segmented Control */}
-      <section className="sticky top-0 md:top-32 z-40 py-4 transition-all duration-300 pointer-events-none">
-        <div className="container-custom flex justify-center pointer-events-auto">
-          <div className="inline-flex items-center p-1.5 bg-gray-100/80 rounded-full border border-gray-200 shadow-inner overflow-x-auto max-w-full scrollbar-hide">
-            <Link
-              href="/members"
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${!batch
-                ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                : 'text-gray-500 hover:text-gray-900'
-                }`}
-            >
-              Semua Angkatan
-            </Link>
-            {batches.map((b) => (
-              <Link
-                key={b}
-                href={`/members?batch=${b}`}
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${batch === b
-                  ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                  : 'text-gray-500 hover:text-gray-900'
-                  }`}
-              >
-                Angkatan {b}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      <SegmentedControl
+        basePath="/members"
+        paramName="batch"
+        currentValue={batch}
+        allLabel="Semua Angkatan"
+        options={batches.map((b) => ({
+          value: b,
+          label: `Angkatan ${b}`,
+        }))}
+      />
 
       {/* Members Grid - Animated */}
       <section className="container-custom py-16">

@@ -8,7 +8,17 @@ import eventsData from '../../../public/data/events.json';
 
 export class JsonEventRepository implements IEventRepository {
   private async fetchEvents(): Promise<Event[]> {
-    return eventsData as Event[];
+    try {
+      // Validate that eventsData is an array
+      if (!eventsData || !Array.isArray(eventsData)) {
+        throw new Error('Invalid events data format');
+      }
+      return eventsData as Event[];
+    } catch (error) {
+      console.error('Failed to fetch events:', error);
+      // TODO: Add error tracking service (e.g., Sentry)
+      throw new Error('Unable to load events. Please try again later.');
+    }
   }
 
   async getAll(): Promise<EventListItem[]> {

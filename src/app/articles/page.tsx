@@ -1,12 +1,13 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
-import Image from 'next/image';
+import { z } from 'zod';
 import { JsonArticleRepository } from '@/infrastructure/repositories/JsonArticleRepository';
 import { ARTICLE_CATEGORIES } from '@/lib/constants';
-import { Calendar, User, Tag, ArrowRight } from 'lucide-react';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 import { ArticlesGrid } from '@/features/articles/components/ArticlesGrid';
+import { SegmentedControl } from '@/shared/components/ui/SegmentedControl';
+import { ArticleCategory } from '@/core/entities/Article';
+
+// Zod schema for validating article category query parameter
+const ArticleCategorySchema = z.enum(['post', 'blog', 'opinion', 'publication', 'info']);
 
 export const metadata: Metadata = {
   title: 'Artikel - HMJF UIN Alauddin',
@@ -19,10 +20,19 @@ export default async function ArticlesPage({
   searchParams: { category?: string };
 }) {
   const articleRepo = new JsonArticleRepository();
-  const category = searchParams.category as keyof typeof ARTICLE_CATEGORIES | undefined;
 
-  const articles = category
-    ? await articleRepo.getByCategory(category as any)
+  // Validate and sanitize category parameter
+  let validatedCategory: ArticleCategory | undefined;
+  if (searchParams.category) {
+    const validation = ArticleCategorySchema.safeParse(searchParams.category);
+    if (validation.success) {
+      validatedCategory = validation.data;
+    }
+    // If validation fails, validatedCategory remains undefined and we show all articles
+  }
+
+  const articles = validatedCategory
+    ? await articleRepo.getByCategory(validatedCategory)
     : await articleRepo.getAll();
 
   return (
@@ -40,34 +50,17 @@ export default async function ArticlesPage({
         </div>
       </section>
 
-      {/* Category Filter - Segmented Control - Floating Style */}
-      <section className="sticky top-0 md:top-32 z-40 py-4 transition-all duration-300 pointer-events-none">
-        <div className="container-custom flex justify-center pointer-events-auto">
-          <div className="inline-flex items-center p-1.5 bg-gray-100/80 rounded-full border border-gray-200 shadow-inner overflow-x-auto max-w-full scrollbar-hide">
-            <Link
-              href="/articles"
-              className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${!category
-                ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                : 'text-gray-500 hover:text-gray-900'
-                }`}
-            >
-              Semua
-            </Link>
-            {Object.entries(ARTICLE_CATEGORIES).map(([key, label]) => (
-              <Link
-                key={key}
-                href={`/articles?category=${key}`}
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all duration-300 ${category === key
-                  ? 'bg-white text-black shadow-sm ring-1 ring-black/5'
-                  : 'text-gray-500 hover:text-gray-900'
-                  }`}
-              >
-                {label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Category Filter - Segmented Control */}
+      <SegmentedControl
+        basePath="/articles"
+        paramName="category"
+        currentValue={validatedCategory}
+        allLabel="Semua"
+        options={Object.entries(ARTICLE_CATEGORIES).map(([value, label]) => ({
+          value,
+          label,
+        }))}
+      />
 
       {/* Articles Masonry Grid - Animated */}
       <section className="container-custom py-16">

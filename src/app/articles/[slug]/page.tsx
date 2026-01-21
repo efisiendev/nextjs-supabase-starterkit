@@ -4,7 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { JsonArticleRepository } from '@/infrastructure/repositories/JsonArticleRepository';
 import { ARTICLE_CATEGORIES } from '@/lib/constants';
-import { Calendar, User, Tag, ArrowLeft, Clock, Eye } from 'lucide-react';
+import { MarkdownContent } from '@/shared/components/ui/MarkdownContent';
+import { Calendar, Tag, ArrowLeft, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -119,13 +120,7 @@ export default async function ArticleDetailPage({ params }: Props) {
             </div>
 
             {/* Content */}
-            <div className="prose prose-lg max-w-none">
-              {article.content.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="mb-4 text-gray-700 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
+            <MarkdownContent content={article.content} />
 
             {/* Tags */}
             {article.tags.length > 0 && (
