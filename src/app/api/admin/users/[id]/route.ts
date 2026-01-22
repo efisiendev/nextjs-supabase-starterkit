@@ -1,0 +1,266 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+// Get single user
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = params.id;
+
+    // Get authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'No authorization header' },
+        { status: 401 }
+      );
+    }
+
+    // Create Supabase client with service role
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    // Verify the user making the request
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user is super_admin
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || profile?.role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Forbidden - super_admin only' },
+        { status: 403 }
+      );
+    }
+
+    // Get user
+    const { data, error } = await supabaseAdmin
+      .from('profiles')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+
+    if (!data) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ user: data });
+  } catch (error) {
+    console.error('Fatal error:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
+  }
+}
+
+// Update user
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = params.id;
+
+    // Get authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'No authorization header' },
+        { status: 401 }
+      );
+    }
+
+    // Create Supabase client with service role
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    // Verify the user making the request
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user is super_admin
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || profile?.role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Forbidden - super_admin only' },
+        { status: 403 }
+      );
+    }
+
+    // Prevent updating own role
+    if (id === user.id) {
+      return NextResponse.json(
+        { error: 'Cannot change your own role' },
+        { status: 403 }
+      );
+    }
+
+    // Get request body
+    const { full_name, role, avatar_url } = await request.json();
+
+    if (!full_name || !role) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate role
+    const validRoles = ['super_admin', 'admin', 'kontributor'];
+    if (!validRoles.includes(role)) {
+      return NextResponse.json(
+        { error: 'Invalid role' },
+        { status: 400 }
+      );
+    }
+
+    // Update profile
+    const { error: updateError } = await supabaseAdmin
+      .from('profiles')
+      .update({
+        full_name,
+        role,
+        avatar_url: avatar_url || null,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', id);
+
+    if (updateError) throw updateError;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Fatal error:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
+  }
+}
+
+// Delete user
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const id = params.id;
+
+    // Get authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader) {
+      return NextResponse.json(
+        { error: 'No authorization header' },
+        { status: 401 }
+      );
+    }
+
+    // Create Supabase client with service role
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    );
+
+    // Verify the user making the request
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: userError } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    // Check if user is super_admin
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || profile?.role !== 'super_admin') {
+      return NextResponse.json(
+        { error: 'Forbidden - super_admin only' },
+        { status: 403 }
+      );
+    }
+
+    // Prevent deleting own account
+    if (id === user.id) {
+      return NextResponse.json(
+        { error: 'Cannot delete your own account' },
+        { status: 403 }
+      );
+    }
+
+    // Delete user (profile will be deleted via CASCADE)
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(id);
+
+    if (deleteError) throw deleteError;
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Fatal error:', error);
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json(
+      { error: message },
+      { status: 500 }
+    );
+  }
+}

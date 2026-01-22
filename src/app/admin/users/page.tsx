@@ -1,22 +1,170 @@
 'use client';
 
-import { useAuth } from '@/lib/auth/AuthContext';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { supabase } from '@/lib/supabase/client';
+import { useAuth, UserRole } from '@/lib/auth/AuthContext';
+import { toast } from 'sonner';
+import { Search, Plus, Edit, Trash2, Shield } from 'lucide-react';
+import Link from 'next/link';
+
+interface User {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: UserRole;
+  avatar_url: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+const ROLE_LABELS: Record<UserRole, string> = {
+  super_admin: 'Super Admin',
+  admin: 'Admin',
+  kontributor: 'Kontributor',
+};
+
+const ROLE_COLORS: Record<UserRole, string> = {
+  super_admin: 'bg-purple-100 text-purple-800',
+  admin: 'bg-blue-100 text-blue-800',
+  kontributor: 'bg-gray-100 text-gray-800',
+};
+
+const ITEMS_PER_PAGE = 20;
 
 export default function UsersPage() {
-  const { profile, hasPermission } = useAuth();
   const router = useRouter();
+  const { profile, hasPermission, loading: authLoading } = useAuth();
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [roleFilter, setRoleFilter] = useState<'all' | UserRole>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    // Only run permission check if profile is loaded
-    if (!profile) return;
+    // Wait for auth to load
+    if (authLoading) return;
 
+    // Check permissions
     if (!hasPermission(['super_admin'])) {
       router.push('/admin/dashboard');
+      return;
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile?.id]);
+  }, [authLoading, profile?.id]);
+
+  // Initial fetch and refetch when filters/pagination change
+  useEffect(() => {
+    // Wait for auth to load
+    if (authLoading) return;
+
+    // Only fetch if user has permission
+    if (!hasPermission(['super_admin'])) return;
+
+    const timer = setTimeout(() => {
+      fetchUsers();
+    }, searchQuery ? 300 : 0); // Debounce only for search
+
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, searchQuery, roleFilter, currentPage, profile?.id]);
+
+  async function fetchUsers() {
+    try {
+      setLoading(true);
+
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error('Not authenticated');
+        return;
+      }
+
+      // Build query params
+      const params = new URLSearchParams({
+        page: currentPage.toString(),
+        limit: ITEMS_PER_PAGE.toString(),
+      });
+
+      if (searchQuery) params.append('search', searchQuery);
+      if (roleFilter !== 'all') params.append('role', roleFilter);
+
+      // Call API route
+      const response = await fetch(`/api/admin/users?${params}`, {
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to load users');
+      }
+
+      const result = await response.json();
+      setUsers(result.users || []);
+      setTotalCount(result.totalCount || 0);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to load users';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDelete(id: string, email: string) {
+    // Prevent deleting own account
+    if (id === profile?.id) {
+      toast.error('You cannot delete your own account');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete ${email}?`)) return;
+
+    // Optimistic update
+    const previousUsers = [...users];
+    setUsers(users.filter((u) => u.id !== id));
+    setTotalCount((prev) => prev - 1);
+
+    try {
+      // Get current session
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error('Not authenticated');
+      }
+
+      // Call API route
+      const response = await fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        throw new Error(result.error || 'Failed to delete user');
+      }
+
+      toast.success('User deleted successfully');
+    } catch (error) {
+      // Rollback on error
+      setUsers(previousUsers);
+      setTotalCount((prev) => prev + 1);
+      const message = error instanceof Error ? error.message : 'Failed to delete user';
+      toast.error(message);
+    }
+  }
+
+  if (loading && users.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -25,20 +173,159 @@ export default function UsersPage() {
           <h1 className="text-2xl font-bold text-gray-900">User Management</h1>
           <p className="text-gray-600 mt-1">Manage admin users and permissions</p>
         </div>
+        <Link
+          href="/admin/users/new"
+          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add User
+        </Link>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
-        <div className="max-w-md mx-auto">
-          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex flex-col md:flex-row gap-4 mb-6">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              />
+            </div>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Coming Soon</h3>
-          <p className="text-gray-600">
-            User management feature is under development. This page will allow you to create, edit, and manage admin users.
-          </p>
+
+          <select
+            value={roleFilter}
+            onChange={(e) => setRoleFilter(e.target.value as 'all' | UserRole)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          >
+            <option value="all">All Roles</option>
+            <option value="super_admin">Super Admin</option>
+            <option value="admin">Admin</option>
+            <option value="kontributor">Kontributor</option>
+          </select>
         </div>
+
+        {users.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">No users found</p>
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-200">
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">User</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Email</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Role</th>
+                    <th className="text-left py-3 px-4 font-semibold text-gray-700">Created</th>
+                    <th className="text-right py-3 px-4 font-semibold text-gray-700">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id} className="border-b border-gray-100 hover:bg-gray-50">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-3">
+                          {user.avatar_url ? (
+                            <img
+                              src={user.avatar_url}
+                              alt={user.full_name || user.email}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
+                              <span className="text-gray-600 font-medium">
+                                {(user.full_name || user.email)[0].toUpperCase()}
+                              </span>
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium text-gray-900">
+                              {user.full_name || 'No name'}
+                            </div>
+                            {user.id === profile?.id && (
+                              <span className="text-xs text-green-600">(You)</span>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-gray-700">{user.email}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-medium rounded-full ${
+                            ROLE_COLORS[user.role]
+                          }`}
+                        >
+                          <Shield className="w-3 h-3" />
+                          {ROLE_LABELS[user.role]}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-gray-700">
+                        {new Date(user.created_at).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center justify-end gap-2">
+                          <Link
+                            href={`/admin/users/${user.id}/edit`}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Link>
+                          {user.id !== profile?.id && (
+                            <button
+                              onClick={() => handleDelete(user.id, user.email)}
+                              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {totalCount > ITEMS_PER_PAGE && (
+              <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
+                <div className="text-sm text-gray-600">
+                  Showing {(currentPage - 1) * ITEMS_PER_PAGE + 1} to{' '}
+                  {Math.min(currentPage * ITEMS_PER_PAGE, totalCount)} of {totalCount} users
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    disabled={currentPage === 1}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <span className="px-4 py-2 text-sm text-gray-600">
+                    Page {currentPage} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
+                  </span>
+                  <button
+                    onClick={() =>
+                      setCurrentPage((p) => Math.min(Math.ceil(totalCount / ITEMS_PER_PAGE), p + 1))
+                    }
+                    disabled={currentPage >= Math.ceil(totalCount / ITEMS_PER_PAGE)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   );
