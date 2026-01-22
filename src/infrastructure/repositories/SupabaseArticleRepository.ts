@@ -9,6 +9,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
       const { data, error } = await supabase
         .from('articles')
         .select('*')
+        .eq('status', 'published')
         .order('published_at', { ascending: false });
 
       if (error) {
@@ -29,6 +30,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
         .from('articles')
         .select('*')
         .eq('slug', slug)
+        .eq('status', 'published')
         .single();
 
       if (error) {
@@ -52,6 +54,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
         .from('articles')
         .select('*')
         .eq('category', category)
+        .eq('status', 'published')
         .order('published_at', { ascending: false });
 
       if (error) {
@@ -72,6 +75,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
         .from('articles')
         .select('*')
         .eq('featured', true)
+        .eq('status', 'published')
         .order('published_at', { ascending: false });
 
       if (limit) {
@@ -97,6 +101,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
       const { data, error } = await supabase
         .from('articles')
         .select('*')
+        .eq('status', 'published')
         .order('published_at', { ascending: false })
         .limit(limit);
 
@@ -132,6 +137,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
         .from('articles')
         .select('*')
         .eq('category', (currentArticle as { category: string }).category)
+        .eq('status', 'published')
         .neq('id', articleId)
         .order('published_at', { ascending: false })
         .limit(limit);
@@ -155,6 +161,7 @@ export class SupabaseArticleRepository implements IArticleRepository {
       const { data, error } = await supabase
         .from('articles')
         .select('*')
+        .eq('status', 'published')
         .or(`title.ilike.%${lowerQuery}%,excerpt.ilike.%${lowerQuery}%,content.ilike.%${lowerQuery}%`)
         .order('published_at', { ascending: false });
 
