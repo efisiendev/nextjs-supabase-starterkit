@@ -13,7 +13,8 @@ import {
   LogOut,
   Menu,
   X,
-  UserCog
+  UserCog,
+  Settings
 } from 'lucide-react';
 
 interface AuthError extends Error {
@@ -42,6 +43,7 @@ const navigation: NavItem[] = [
   { name: 'Events', href: '/admin/events', icon: Calendar, roles: ['super_admin', 'admin', 'kontributor'] },
   { name: 'Leadership', href: '/admin/leadership', icon: Award, roles: ['super_admin', 'admin'] },
   { name: 'Users', href: '/admin/users', icon: UserCog, roles: ['super_admin'] },
+  { name: 'Settings', href: '/admin/settings', icon: Settings, roles: ['super_admin', 'admin'] },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
