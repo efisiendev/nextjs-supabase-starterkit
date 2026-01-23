@@ -8,7 +8,7 @@ import { AuthProvider } from '@/lib/auth/AuthContext';
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
-  display: 'swap',
+  display: 'optional',
   fallback: ['system-ui', '-apple-system', 'sans-serif'],
   preload: true,
   adjustFontFallback: true,
@@ -16,9 +16,9 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 const poppins = Poppins({
   subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
+  weight: ['600', '700', '800'],
   variable: '--font-heading',
-  display: 'swap',
+  display: 'optional',
   fallback: ['system-ui', '-apple-system', 'sans-serif'],
   preload: true,
   adjustFontFallback: true,
@@ -77,6 +77,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id" className="scroll-smooth">
+      <head>
+        <link rel="preconnect" href="https://images.unsplash.com" />
+        <link rel="dns-prefetch" href="https://images.unsplash.com" />
+      </head>
       <body className={`${plusJakarta.variable} ${poppins.variable} font-sans antialiased`}>
         <AuthProvider>
           {children}

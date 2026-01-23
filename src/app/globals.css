@@ -3,8 +3,22 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
     @apply bg-white text-gray-900;
+    min-height: 100vh;
+  }
+
+  * {
+    -webkit-tap-highlight-color: transparent;
   }
 }
 
@@ -17,12 +31,10 @@
     @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
   }
 
-  /* Smooth transitions for interactive elements */
   a, button {
     @apply transition-colors duration-200;
   }
 
-  /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
@@ -31,31 +43,38 @@
     display: none;
   }
 
-  /* Smooth scale animation on hover */
   .hover-lift {
-    @apply transition-transform duration-300 ease-out hover:scale-105;
+    @apply transition-transform duration-300 ease-out;
+    will-change: transform;
+  }
+  .hover-lift:hover {
+    transform: scale(1.05);
   }
 
-  /* Gradient text effect */
   .gradient-text {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-secondary-600;
   }
-  
-  /* Performance-optimized animations */
+
   .animate-float {
     animation: float 6s ease-in-out infinite;
+    will-change: transform;
   }
-  
+
   .animate-float-delayed {
     animation: float 6s ease-in-out 3s infinite;
+    will-change: transform;
   }
-  
+
   .animate-pulse-slow {
     animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
   @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-20px); }
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
   }
 }

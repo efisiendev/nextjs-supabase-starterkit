@@ -12,27 +12,26 @@ import { motion } from 'framer-motion';
 import { CountingNumber } from '@/shared/components/ui/CountingNumber';
 import { HomeSettings } from '@/core/repositories/ISettingsRepository';
 
-// Simplified animation variants - Reduced complexity
+// Optimized animation variants for better performance
 const container = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.15,
-      delayChildren: 0.1,
+      staggerChildren: 0.08,
+      delayChildren: 0,
     },
   },
 };
 
 const item = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 20 },
   show: {
     opacity: 1,
     y: 0,
     transition: {
-      type: "spring",
-      stiffness: 50,
-      damping: 20
+      duration: 0.4,
+      ease: "easeOut"
     }
   },
 };
@@ -48,7 +47,7 @@ export function HeroSection({ data }: HeroSectionProps) {
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary-50 rounded-full blur-[100px] opacity-60 -translate-y-1/2 translate-x-1/3" />
       <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-secondary-50 rounded-full blur-[100px] opacity-60 translate-y-1/3 -translate-x-1/4" />
 
-      <div className="container-custom relative z-10 w-full">
+      <div className="container-custom relative z-10 w-full" style={{ minHeight: '600px' }}>
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           {/* Text Content - Editorially aligned */}
           <motion.div
@@ -56,6 +55,7 @@ export function HeroSection({ data }: HeroSectionProps) {
             initial="hidden"
             animate="show"
             className="lg:col-span-7 flex flex-col justify-center"
+            style={{ minHeight: '500px' }}
           >
             {/* Badge - Minimalist pill */}
             <motion.div variants={item} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-100 w-fit mb-8">
@@ -63,8 +63,12 @@ export function HeroSection({ data }: HeroSectionProps) {
               <span className="text-sm font-medium text-gray-600 tracking-wide uppercase">{data.badge}</span>
             </motion.div>
 
-            {/* Headline - Massive & Tight */}
-            <motion.h1 variants={item} className="text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-[1.1] md:leading-[1] tracking-tighter mb-8">
+            {/* Headline - Massive & Tight - LCP Element Optimized */}
+            <motion.h1
+              variants={item}
+              className="text-6xl md:text-7xl lg:text-8xl font-black text-gray-900 leading-[1.1] md:leading-[1] tracking-tighter mb-8"
+              style={{ contentVisibility: 'auto', minHeight: '200px' }}
+            >
               {data.title}
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-secondary-500">
@@ -113,31 +117,37 @@ export function HeroSection({ data }: HeroSectionProps) {
 
           {/* Visual - Editorial Image Composition (No Card Box) */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0 }}
             className="lg:col-span-5 relative h-[600px] hidden lg:block"
+            style={{ minHeight: '600px' }}
           >
             {/* Main Hero Image - Organic Shape */}
             <div className="relative z-10 w-full h-full">
-              <div className="absolute right-0 top-0 w-4/5 h-4/5 rounded-[4rem] rounded-tr-[10rem] overflow-hidden rotate-3 hover:rotate-0 transition-all duration-700 ease-out shadow-2xl shadow-primary-900/10">
+              <div className="absolute right-0 top-0 w-4/5 h-4/5 rounded-[4rem] rounded-tr-[10rem] overflow-hidden shadow-2xl shadow-primary-900/10" style={{ transform: 'rotate(3deg)' }}>
                 <Image
                   src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&q=80&w=2070"
                   alt="Pharmacy Student"
                   fill
                   className="object-cover"
                   priority
+                  fetchPriority="high"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  placeholder="blur"
+                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAb/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k="
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
               </div>
 
               {/* Floating Accent Image */}
-              <div className="absolute left-0 bottom-20 w-3/5 h-2/5 rounded-[3rem] rounded-bl-[6rem] overflow-hidden -rotate-6 hover:-rotate-3 transition-all duration-500 ease-out shadow-xl shadow-secondary-900/10 border-4 border-white">
+              <div className="absolute left-0 bottom-20 w-3/5 h-2/5 rounded-[3rem] rounded-bl-[6rem] overflow-hidden shadow-xl shadow-secondary-900/10 border-4 border-white" style={{ transform: 'rotate(-6deg)' }}>
                 <Image
                   src="https://images.unsplash.com/photo-1631549916768-4119b2e5f926?auto=format&fit=crop&q=80&w=2079"
                   alt="Lab Work"
                   fill
                   className="object-cover"
+                  sizes="(max-width: 768px) 100vw, 30vw"
                 />
               </div>
 

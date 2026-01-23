@@ -118,7 +118,7 @@ export function AboutContent({ data }: AboutContentProps) {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
-                        {data.values.map((value, index) => {
+                        {data.values?.map((value, index) => {
                             const Icon = iconMap[value.icon] || Leaf;
                             return (
                                 <div key={index} className="group text-center">
@@ -139,25 +139,27 @@ export function AboutContent({ data }: AboutContentProps) {
             </Section>
 
             {/* Statistics - Bold Numbers */}
-            <Section className="py-24 bg-primary-50">
-                <div className="container-custom">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-                        {Object.entries(data.statistics).map(([key, value]) => (
-                            <div key={key} className="text-center">
-                                <div className="text-4xl md:text-6xl font-black text-gray-900 mb-2 tracking-tighter">
-                                    {value}
+            {data.statistics && (
+                <Section className="py-24 bg-primary-50">
+                    <div className="container-custom">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+                            {Object.entries(data.statistics).map(([key, value]) => (
+                                <div key={key} className="text-center">
+                                    <div className="text-4xl md:text-6xl font-black text-gray-900 mb-2 tracking-tighter">
+                                        {value}
+                                    </div>
+                                    <div className="text-sm font-bold text-primary-600 uppercase tracking-widest">
+                                        {key === 'activeMembers' && 'Anggota Aktif'}
+                                        {key === 'eventsPerYear' && 'Event / Tahun'}
+                                        {key === 'divisions' && 'Divisi'}
+                                        {key === 'yearsActive' && 'Tahun Berdiri'}
+                                    </div>
                                 </div>
-                                <div className="text-sm font-bold text-primary-600 uppercase tracking-widest">
-                                    {key === 'activeMembers' && 'Anggota Aktif'}
-                                    {key === 'eventsPerYear' && 'Event / Tahun'}
-                                    {key === 'divisions' && 'Divisi'}
-                                    {key === 'yearsActive' && 'Tahun Berdiri'}
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
                     </div>
-                </div>
-            </Section>
+                </Section>
+            )}
 
             {/* Timeline */}
             <Section className="py-24">
@@ -174,7 +176,7 @@ export function AboutContent({ data }: AboutContentProps) {
                 <div className="container-custom">
                     <h2 className="text-3xl font-bold mb-16 text-center">Kemitraan & Afiliasi</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-                        {data.affiliations.map((affiliation) => (
+                        {data.affiliations?.map((affiliation) => (
                             <div key={affiliation.name} className="border-t pt-8 border-gray-800 hover:border-primary-500 transition-colors duration-300">
                                 <div className="flex flex-col md:flex-row items-center md:items-start gap-4">
                                     <div className="p-3 bg-white/5 rounded-lg">
@@ -196,7 +198,7 @@ export function AboutContent({ data }: AboutContentProps) {
             <Section className="py-24">
                 <div className="container-custom max-w-5xl">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {data.certifications.map((cert) => (
+                        {data.certifications?.map((cert) => (
                             <div key={cert.name} className="flex items-center gap-6 p-6 rounded-3xl hover:bg-gray-50 transition-colors duration-300">
                                 <div className="w-20 h-20 bg-gradient-to-br from-primary-100 to-secondary-100 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm">
                                     <Award className="w-10 h-10 text-primary-600" />

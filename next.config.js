@@ -18,9 +18,45 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    optimizePackageImports: ['lucide-react'],
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
   },
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion', '@supabase/supabase-js'],
+    optimizeCss: true,
+    cssChunking: 'loose',
+  },
+  reactStrictMode: true,
+  swcMinify: true,
+  compress: true,
+  poweredByHeader: false,
+  headers: async () => [
+    {
+      source: '/:path*',
+      headers: [
+        {
+          key: 'X-DNS-Prefetch-Control',
+          value: 'on'
+        },
+        {
+          key: 'Strict-Transport-Security',
+          value: 'max-age=63072000; includeSubDomains; preload'
+        },
+        {
+          key: 'X-Content-Type-Options',
+          value: 'nosniff'
+        },
+        {
+          key: 'X-Frame-Options',
+          value: 'SAMEORIGIN'
+        },
+        {
+          key: 'Referrer-Policy',
+          value: 'strict-origin-when-cross-origin'
+        },
+      ],
+    },
+  ],
 }
 
 module.exports = nextConfig
