@@ -1,15 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
-import { ArrowLeft, Upload, X } from 'lucide-react';
-import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { useAdminForm } from '@/shared/hooks/useAdminForm';
 import { RichTextEditor } from '@/shared/components/RichTextEditor';
-import { LeadershipFormData } from '@/types';
-import { Leadership, LeadershipInsertData, LeadershipUpdateData } from '@/types/leadership';
-import { showError, showSuccess } from '@/lib/utils/error-handler';
-import { FormSkeleton } from '@/components/ui/Skeleton';
+import { FormInput } from '@/shared/components/FormInput';
+import { FormSelect } from '@/shared/components/FormSelect';
+import { FormActions } from '@/shared/components/FormActions';
+import { LeadershipFormData } from '@/types/forms';
 
 const POSITIONS = [
   { value: 'ketua', label: 'Ketua' },
@@ -32,496 +29,239 @@ const DIVISIONS = [
 ];
 
 export default function LeadershipFormPage() {
-  const router = useRouter();
   const params = useParams();
-  const id = params?.id as string;
-  const isCreateMode = id === 'new';
+  const id = params.id as string;
 
-  const [loading, setLoading] = useState(false);
-  const [initialLoading, setInitialLoading] = useState(!isCreateMode);
-  const [photoPreview, setPhotoPreview] = useState<string>('');
-  const [formData, setFormData] = useState<LeadershipFormData>({
-    name: '',
-    position: '',
-    division: '',
-    photo: '',
-    email: '',
-    phone: '',
-    nim: '',
-    batch: '',
-    bio: '',
-    social_media_instagram: '',
-    social_media_linkedin: '',
-    social_media_twitter: '',
-    period_start: '',
-    period_end: '',
-    order: 1,
+  const {
+    formData,
+    setFormData,
+    loading,
+    fetching,
+    isCreateMode,
+    handleSubmit,
+  } = useAdminForm<LeadershipFormData>({
+    tableName: 'leadership',
+    id,
+    initialData: {
+      name: '',
+      position: '',
+      division: '',
+      photo: '',
+      email: '',
+      phone: '',
+      nim: '',
+      batch: '',
+      bio: '',
+      social_media_instagram: '',
+      social_media_linkedin: '',
+      social_media_twitter: '',
+      period_start: '',
+      period_end: '',
+      order: 1,
+    },
+    redirectPath: '/admin/leadership',
+    onBeforeSave: (data) => {
+      const socialMedia: Record<string, string> = {};
+      if (data.social_media_instagram) {
+        socialMedia.instagram = data.social_media_instagram;
+      }
+      if (data.social_media_linkedin) {
+        socialMedia.linkedin = data.social_media_linkedin;
+      }
+      if (data.social_media_twitter) {
+        socialMedia.twitter = data.social_media_twitter;
+      }
+
+      return {
+        name: data.name,
+        position: data.position,
+        division: data.division,
+        photo: data.photo || null,
+        email: data.email || null,
+        phone: data.phone || null,
+        nim: data.nim || null,
+        batch: data.batch || null,
+        bio: data.bio || null,
+        social_media: Object.keys(socialMedia).length > 0 ? socialMedia : null,
+        period_start: data.period_start || null,
+        period_end: data.period_end || null,
+        order: data.order,
+      };
+    },
   });
 
-  useEffect(() => {
-    if (!isCreateMode && id) {
-      fetchLeader();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, isCreateMode]);
-
-  async function fetchLeader() {
-    try {
-      const { data, error } = await supabase
-        .from('leadership')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-
-      if (!data) {
-        showError('Leader not found');
-        router.push('/admin/leadership');
-        return;
-      }
-
-      const leader = data as Leadership;
-
-      setFormData({
-        name: leader.name || '',
-        position: leader.position || '',
-        division: leader.division || '',
-        photo: leader.photo || '',
-        email: leader.email || '',
-        phone: leader.phone || '',
-        nim: leader.nim || '',
-        batch: leader.batch || '',
-        bio: leader.bio || '',
-        social_media_instagram: leader.social_media?.instagram || '',
-        social_media_linkedin: leader.social_media?.linkedin || '',
-        social_media_twitter: leader.social_media?.twitter || '',
-        period_start: leader.period_start || '',
-        period_end: leader.period_end || '',
-        order: leader.order || 1,
-      });
-      setPhotoPreview(leader.photo || '');
-    } catch (error) {
-      showError(error, 'Failed to load leader');
-      router.push('/admin/leadership');
-    } finally {
-      setInitialLoading(false);
-    }
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSocialMediaChange = (platform: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [`social_media_${platform}`]: value,
-    }));
-  };
-
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-      showError('Please upload an image file');
-      return;
-    }
-
-    if (file.size > 2 * 1024 * 1024) {
-      showError('Image size must be less than 2MB');
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `leadership/${fileName}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('public-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('public-images')
-        .getPublicUrl(filePath);
-
-      setFormData((prev) => ({ ...prev, photo: publicUrl }));
-      setPhotoPreview(publicUrl);
-      showSuccess('Photo uploaded successfully');
-    } catch (error) {
-      showError(error, 'Failed to upload photo');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleRemovePhoto = () => {
-    setFormData((prev) => ({ ...prev, photo: '' }));
-    setPhotoPreview('');
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.name || !formData.position || !formData.photo || !formData.period_start || !formData.period_end) {
-      showError('Please fill in all required fields');
-      return;
-    }
-
-    try {
-      setLoading(true);
-
-      const socialMedia: Record<string, string> = {};
-      if (formData.social_media_instagram) socialMedia.instagram = formData.social_media_instagram;
-      if (formData.social_media_linkedin) socialMedia.linkedin = formData.social_media_linkedin;
-      if (formData.social_media_twitter) socialMedia.twitter = formData.social_media_twitter;
-
-      if (isCreateMode) {
-        const leadershipData: LeadershipInsertData = {
-          name: formData.name,
-          position: formData.position as LeadershipInsertData['position'],
-          division: formData.division || null,
-          photo: formData.photo,
-          email: formData.email || null,
-          phone: formData.phone || null,
-          nim: formData.nim || null,
-          batch: formData.batch || null,
-          bio: formData.bio || null,
-          social_media: Object.keys(socialMedia).length > 0 ? socialMedia : null,
-          period_start: formData.period_start,
-          period_end: formData.period_end,
-          order: formData.order,
-        };
-
-        const { error } = await supabase
-          .from('leadership')
-          .insert(leadershipData as unknown as never);
-
-        if (error) throw error;
-        showSuccess('Leader added successfully');
-      } else {
-        const leadershipData: LeadershipUpdateData = {
-          name: formData.name,
-          position: formData.position as LeadershipUpdateData['position'],
-          division: formData.division || null,
-          photo: formData.photo,
-          email: formData.email || null,
-          phone: formData.phone || null,
-          nim: formData.nim || null,
-          batch: formData.batch || null,
-          bio: formData.bio || null,
-          social_media: Object.keys(socialMedia).length > 0 ? socialMedia : null,
-          period_start: formData.period_start,
-          period_end: formData.period_end,
-          order: formData.order,
-        };
-
-        const { error } = await supabase
-          .from('leadership')
-          .update(leadershipData as unknown as never)
-          .eq('id', id);
-
-        if (error) throw error;
-        showSuccess('Leader updated successfully');
-      }
-
-      router.push('/admin/leadership');
-    } catch (error) {
-      showError(error, isCreateMode ? 'Failed to add leader' : 'Failed to update leader');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (initialLoading) {
+  if (fetching) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-gray-200 rounded-lg animate-pulse" />
-          <div className="space-y-2">
-            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-64 bg-gray-200 rounded animate-pulse" />
-          </div>
-        </div>
-        <FormSkeleton />
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link
-          href="/admin/leadership"
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Link>
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            {isCreateMode ? 'Add New Leader' : 'Edit Leader'}
-          </h1>
-          <p className="text-gray-600 mt-1">
-            {isCreateMode ? 'Create a new leadership member' : 'Update leadership member information'}
-          </p>
-        </div>
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {isCreateMode ? 'Add New Leader' : 'Edit Leader'}
+        </h1>
+        <p className="text-gray-600 mt-1">
+          {isCreateMode ? 'Fill in the leadership details' : 'Update leadership information'}
+        </p>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="space-y-6">
-          {/* Photo Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Photo <span className="text-red-500">*</span>
-            </label>
-            {photoPreview ? (
-              <div className="relative w-32 h-32">
-                <img
-                  src={photoPreview}
-                  alt="Preview"
-                  className="w-full h-full rounded-lg object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={handleRemovePhoto}
-                  className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            ) : (
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                  id="photo-upload"
-                />
-                <label
-                  htmlFor="photo-upload"
-                  className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-green-500 transition-colors"
-                >
-                  <Upload className="w-5 h-5 text-gray-400" />
-                  <span className="text-sm text-gray-600">Upload Photo</span>
-                </label>
-              </div>
-            )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="Full Name"
+              id="name"
+              value={formData.name}
+              onChange={(value) => setFormData({ ...formData, name: value })}
+              required
+            />
+
+            <FormInput
+              label="Email"
+              id="email"
+              type="email"
+              value={formData.email}
+              onChange={(value) => setFormData({ ...formData, email: value })}
+              required
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Name */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
+            <FormSelect
+              label="Position"
+              id="position"
+              value={formData.position}
+              onChange={(value) => setFormData({ ...formData, position: value })}
+              options={POSITIONS}
+              required
+            />
 
-            {/* Position */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Position <span className="text-red-500">*</span>
-              </label>
-              <select
-                name="position"
-                value={formData.position}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">Select Position</option>
-                {POSITIONS.map((pos) => (
-                  <option key={pos.value} value={pos.value}>
-                    {pos.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Division */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Division</label>
-              <select
-                name="division"
-                value={formData.division}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                <option value="">No Division</option>
-                {DIVISIONS.map((div) => (
-                  <option key={div.value} value={div.value}>
-                    {div.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-              <input
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Phone</label>
-              <input
-                type="tel"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* NIM */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">NIM</label>
-              <input
-                type="text"
-                name="nim"
-                value={formData.nim}
-                onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Batch */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Batch</label>
-              <input
-                type="text"
-                name="batch"
-                value={formData.batch}
-                onChange={handleChange}
-                placeholder="e.g., 2023"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Period Start */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Period Start <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="period_start"
-                value={formData.period_start}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Period End */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Period End <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="date"
-                name="period_end"
-                value={formData.period_end}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
-
-            {/* Order */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Order <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="number"
-                name="order"
-                value={formData.order}
-                onChange={handleChange}
-                min="1"
-                required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
+            <FormSelect
+              label="Division"
+              id="division"
+              value={formData.division}
+              onChange={(value) => setFormData({ ...formData, division: value })}
+              options={DIVISIONS}
+              required
+            />
           </div>
 
-          {/* Bio */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="NIM"
+              id="nim"
+              value={formData.nim}
+              onChange={(value) => setFormData({ ...formData, nim: value })}
+              required
+            />
+
+            <FormInput
+              label="Batch"
+              id="batch"
+              value={formData.batch}
+              onChange={(value) => setFormData({ ...formData, batch: value })}
+              required
+              placeholder="2020"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="Phone"
+              id="phone"
+              value={formData.phone}
+              onChange={(value) => setFormData({ ...formData, phone: value })}
+              placeholder="08123456789"
+            />
+
+            <FormInput
+              label="Photo URL"
+              id="photo"
+              type="url"
+              value={formData.photo}
+              onChange={(value) => setFormData({ ...formData, photo: value })}
+              required
+              placeholder="https://example.com/photo.jpg"
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="Period Start"
+              id="period_start"
+              value={formData.period_start}
+              onChange={(value) => setFormData({ ...formData, period_start: value })}
+              required
+              placeholder="2024"
+            />
+
+            <FormInput
+              label="Period End"
+              id="period_end"
+              value={formData.period_end}
+              onChange={(value) => setFormData({ ...formData, period_end: value })}
+              required
+              placeholder="2025"
+            />
+          </div>
+
+          <FormInput
+            label="Order"
+            id="order"
+            type="number"
+            value={formData.order.toString()}
+            onChange={(value) => setFormData({ ...formData, order: parseInt(value) || 1 })}
+            required
+            placeholder="1"
+          />
+
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Bio</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Bio
+            </label>
             <RichTextEditor
               value={formData.bio}
-              onChange={(markdown) => setFormData((prev) => ({ ...prev, bio: markdown }))}
-              placeholder="Write leader bio..."
+              onChange={(value) => setFormData({ ...formData, bio: value })}
+              placeholder="Short biography..."
               height="300px"
             />
           </div>
 
-          {/* Social Media */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Social Media</label>
-            <div className="space-y-3">
-              <input
-                type="url"
-                placeholder="Instagram URL"
-                value={formData.social_media_instagram || ''}
-                onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-              <input
-                type="url"
-                placeholder="LinkedIn URL"
-                value={formData.social_media_linkedin || ''}
-                onChange={(e) => handleSocialMediaChange('linkedin', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-              <input
-                type="url"
-                placeholder="Twitter URL"
-                value={formData.social_media_twitter || ''}
-                onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              />
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormInput
+              label="Instagram Username"
+              id="social_media_instagram"
+              value={formData.social_media_instagram}
+              onChange={(value) => setFormData({ ...formData, social_media_instagram: value })}
+              placeholder="username (without @)"
+            />
+
+            <FormInput
+              label="LinkedIn URL"
+              id="social_media_linkedin"
+              type="url"
+              value={formData.social_media_linkedin}
+              onChange={(value) => setFormData({ ...formData, social_media_linkedin: value })}
+              placeholder="https://linkedin.com/in/username"
+            />
           </div>
 
-          {/* Submit Buttons */}
-          <div className="flex items-center justify-end gap-4 pt-6 border-t border-gray-200">
-            <Link
-              href="/admin/leadership"
-              className="px-6 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              Cancel
-            </Link>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {loading ? (isCreateMode ? 'Adding...' : 'Updating...') : (isCreateMode ? 'Add Leader' : 'Update Leader')}
-            </button>
-          </div>
+          <FormInput
+            label="Twitter URL"
+            id="social_media_twitter"
+            type="url"
+            value={formData.social_media_twitter}
+            onChange={(value) => setFormData({ ...formData, social_media_twitter: value })}
+            placeholder="https://twitter.com/username"
+          />
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-gray-200">
+          <FormActions backUrl="/admin/leadership" loading={loading} isCreateMode={isCreateMode} />
         </div>
       </form>
     </div>
