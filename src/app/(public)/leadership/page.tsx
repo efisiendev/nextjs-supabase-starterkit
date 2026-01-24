@@ -2,20 +2,32 @@
 
 import Image from 'next/image';
 import { getActiveLeadership, type LeadershipMember } from '@/lib/api/leadership';
-import { DIVISIONS } from '@/config';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useEffect, useState, useRef } from 'react';
 
-const positionLabels: Record<string, string> = {
-  'ketua': 'Ketua',
-  'wakil-ketua': 'Wakil Ketua',
-  'sekretaris': 'Sekretaris',
-  'bendahara': 'Bendahara',
-  'coordinator': 'Koordinator',
-  'member': 'Anggota',
-};
+/**
+ * Format position string for display
+ * Examples: 'ketua' → 'Ketua', 'wakil-ketua' → 'Wakil Ketua', 'coordinator' → 'Koordinator'
+ */
+function formatPosition(position: string): string {
+  return position
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
 
-// Core positions (no division)
+/**
+ * Format division string for display
+ * Examples: 'internal-affairs' → 'Internal Affairs', 'media-information' → 'Media Information'
+ */
+function formatDivision(division: string): string {
+  return division
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
+// Core positions determined by absence of division (already dynamic)
 const corePositions = ['ketua', 'wakil-ketua', 'sekretaris', 'bendahara'];
 
 export default function LeadershipPage() {
@@ -125,7 +137,7 @@ export default function LeadershipPage() {
                 <div className="border-t border-gray-800 pt-4 group-hover:border-primary-500 transition-colors duration-500">
                   <h3 className="text-2xl font-bold mb-1 tracking-tight">{member.name}</h3>
                   <p className="text-primary-500 text-sm font-mono tracking-widest uppercase opacity-80 group-hover:opacity-100 transition-opacity">
-                    {positionLabels[member.position]}
+                    {formatPosition(member.position)}
                   </p>
                 </div>
               </motion.div>
@@ -149,7 +161,7 @@ export default function LeadershipPage() {
               {/* Division Header - Big Typography */}
               <div className="flex flex-col md:flex-row md:items-end justify-between border-b-4 border-black pb-6 mb-12">
                 <h2 className="text-3xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter text-black leading-none mb-4 md:mb-0">
-                  {DIVISIONS[division as keyof typeof DIVISIONS]}
+                  {formatDivision(division)}
                 </h2>
                 <span className="text-2xl font-bold font-mono text-gray-300 mt-4 md:mt-0">
                   {String(members.length).padStart(2, '0')} MEMBERS
@@ -183,7 +195,7 @@ export default function LeadershipPage() {
                         {member.name}
                       </h4>
                       <p className="text-sm text-gray-500 font-mono mt-1 uppercase tracking-wide">
-                        {positionLabels[member.position]}
+                        {formatPosition(member.position)}
                       </p>
                     </div>
                   </motion.div>
