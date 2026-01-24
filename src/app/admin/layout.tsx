@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -49,30 +49,31 @@ const navigation: NavItem[] = [
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { user, profile, signOut, loading, error, refreshProfile } = useAuth();
   const router = useRouter();
+
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  // Use ref to store router to avoid re-renders when router changes
+  const routerRef = useRef(router);
+  useEffect(() => {
+    routerRef.current = router;
+  }, [router]);
+
+  // Track if we've ever successfully loaded auth (prevent loading screen loop)
+  const hasLoadedAuth = useRef(false);
+  if (!loading && (user || profile)) {
+    hasLoadedAuth.current = true;
+  }
+
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[AdminLayout] Auth check:', { loading, user: !!user, profile: !!profile });
-    }
-
     if (!loading && !user) {
-      if (process.env.NODE_ENV === 'development') {
-        console.warn('[AdminLayout] No user, redirecting to login');
-      }
-      router.push('/auth/login');
+      routerRef.current.push('/auth/login');
     }
-    // We do NOT redirect if user exists but profile is missing.
-    // Instead we show a loading/error state below to prevent redirecting loop.
-  }, [loading, user, router]);
+  }, [loading, user]);
 
-  // Show loading state
-  if (loading) {
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[AdminLayout] Showing loading state');
-    }
+  // Only show loading on VERY FIRST load (never show again after initial auth)
+  if (!hasLoadedAuth.current && loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-600"></div>
@@ -80,7 +81,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Don't render if not authenticated
+  // Don't render if not authenticated (triggers redirect)
   if (!user) {
     return null;
   }

@@ -4,7 +4,7 @@ import { Timeline } from '@/features/about/components/Timeline';
 import { Section } from '@/shared/components/ui/Section';
 import { Leaf, Target, Heart, Award, BookOpen, Users, HeartHandshake, Briefcase, LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { AboutSettings } from '@/core/repositories/ISettingsRepository';
+import { AboutSettings } from '@/config';
 
 const iconMap: Record<string, LucideIcon> = {
     BookOpen,
@@ -119,7 +119,7 @@ export function AboutContent({ data }: AboutContentProps) {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12">
                         {data.values?.map((value, index) => {
-                            const Icon = iconMap[value.icon] || Leaf;
+                            const Icon = value.icon ? iconMap[value.icon] || Leaf : Leaf;
                             return (
                                 <div key={index} className="group text-center">
                                     <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:scale-110 group-hover:bg-primary-100 transition-all duration-300">

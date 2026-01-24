@@ -1,13 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase/client';
-import { useAuth } from '@/lib/auth/AuthContext';
-import { toast } from 'sonner';
+import { useMemo, useCallback } from 'react';
+import { useAdminTable } from '@/shared/hooks/useAdminTable';
 import { Search, Plus, Edit, Trash2, Calendar } from 'lucide-react';
 import Link from 'next/link';
 import { Leadership } from '@/types/leadership';
+import { ITEMS_PER_PAGE } from '@/lib/constants/admin';
 
 const POSITION_LABELS: Record<string, string> = {
   'ketua': 'Ketua',
@@ -29,102 +27,33 @@ const DIVISION_LABELS: Record<string, string> = {
   'islamic-spirituality': 'Islamic Spirituality',
 };
 
-const ITEMS_PER_PAGE = 20;
-
 export default function LeadershipPage() {
-  const router = useRouter();
-  const { profile, hasPermission, loading: authLoading } = useAuth();
-  const [leaders, setLeaders] = useState<Leadership[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  // Memoize searchColumns to prevent infinite re-renders
+  const searchColumns = useMemo(() => ['name', 'position', 'email'], []);
 
-  useEffect(() => {
-    // Wait for auth to load
-    if (authLoading) return;
+  const {
+    items: leaders,
+    loading,
+    searchQuery,
+    setSearchQuery,
+    currentPage,
+    setCurrentPage,
+    totalCount,
+    totalPages,
+    deleteItem,
+  } = useAdminTable<Leadership>({
+    tableName: 'leadership',
+    selectColumns: '*',
+    sortColumn: 'order',
+    sortAscending: true,
+    itemsPerPage: ITEMS_PER_PAGE,
+    searchColumns,
+  });
 
-    // Check permissions
-    if (!hasPermission(['super_admin', 'admin'])) {
-      router.push('/admin/dashboard');
-      return;
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, profile?.id]);
-
-  // Initial fetch and refetch when filters/pagination change
-  useEffect(() => {
-    // Wait for auth to load
-    if (authLoading) return;
-
-    // Only fetch if user has permission
-    if (!hasPermission(['super_admin', 'admin'])) return;
-
-    const timer = setTimeout(() => {
-      fetchLeaders();
-    }, searchQuery ? 300 : 0); // Debounce only for search
-
-    return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [authLoading, searchQuery, currentPage, profile?.id]);
-
-  async function fetchLeaders() {
-    try {
-      setLoading(true);
-
-      // Build query with server-side filtering
-      let query = supabase
-        .from('leadership')
-        .select('*', { count: 'exact' })
-        .order('order');
-
-      // Server-side search filter
-      if (searchQuery) {
-        query = query.or(`name.ilike.%${searchQuery}%,position.ilike.%${searchQuery}%,email.ilike.%${searchQuery}%`);
-      }
-
-      // Pagination
-      const from = (currentPage - 1) * ITEMS_PER_PAGE;
-      const to = from + ITEMS_PER_PAGE - 1;
-      query = query.range(from, to);
-
-      const { data, error, count } = await query;
-
-      if (error) throw error;
-
-      setLeaders((data || []) as Leadership[]);
-      setTotalCount(count || 0);
-    } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to load leadership';
-      toast.error(message);
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function handleDelete(id: string, name: string) {
+  const handleDelete = useCallback(async (id: string, name: string) => {
     if (!confirm(`Are you sure you want to delete ${name}?`)) return;
-
-    // Optimistic update
-    const previousLeaders = [...leaders];
-    setLeaders(leaders.filter((l) => l.id !== id));
-    setTotalCount((prev) => prev - 1);
-
-    try {
-      const { error } = await supabase.from('leadership').delete().eq('id', id);
-
-      if (error) throw error;
-
-      toast.success('Leader deleted successfully');
-    } catch (error) {
-      // Rollback on error
-      setLeaders(previousLeaders);
-      setTotalCount((prev) => prev + 1);
-      const message = error instanceof Error ? error.message : 'Failed to delete leader';
-      toast.error(message);
-    }
-  }
+    await deleteItem(id);
+  }, [deleteItem]);
 
   if (loading) {
     return (
@@ -218,7 +147,7 @@ export default function LeadershipPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            href={`/admin/leadership/${leader.id}/edit`}
+                            href={`/admin/leadership/${leader.id}`}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit"
                           >
@@ -248,20 +177,18 @@ export default function LeadershipPage() {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                    onClick={() => setCurrentPage(currentPage - 1)}
                     disabled={currentPage === 1}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Previous
                   </button>
                   <span className="px-4 py-2 text-sm text-gray-600">
-                    Page {currentPage} of {Math.ceil(totalCount / ITEMS_PER_PAGE)}
+                    Page {currentPage} of {totalPages}
                   </span>
                   <button
-                    onClick={() =>
-                      setCurrentPage((p) => Math.min(Math.ceil(totalCount / ITEMS_PER_PAGE), p + 1))
-                    }
-                    disabled={currentPage >= Math.ceil(totalCount / ITEMS_PER_PAGE)}
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                    disabled={currentPage >= totalPages}
                     className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     Next

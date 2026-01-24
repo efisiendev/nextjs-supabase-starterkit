@@ -1,11 +1,67 @@
 'use client';
 
+/**
+ * Authentication Context
+ *
+ * Provides centralized authentication state management with Supabase.
+ * Handles JWT-based authentication, role-based access control, and profile management.
+ *
+ * @remarks
+ * Key Features:
+ * - Automatic session detection and refresh
+ * - Race condition prevention with request queueing
+ * - Profile fetch with retry logic for database triggers
+ * - Role-based permission helpers
+ * - Error resilience (keeps existing profile on network errors)
+ *
+ * Authentication Flow:
+ * 1. Component mounts → `initAuth()` checks for existing session
+ * 2. If session exists → fetch user profile from database
+ * 3. Listen for auth state changes (signin, signout, token refresh)
+ * 4. On SIGNED_IN → fetch new profile
+ * 5. On TOKEN_REFRESHED → keep existing profile (prevents random logouts)
+ * 6. On SIGNED_OUT → clear all state
+ *
+ * Race Condition Handling:
+ * - Uses `isFetchingRef` to prevent concurrent profile fetches
+ * - Queues pending requests in `pendingFetchRef`
+ * - Processes queue after current fetch completes
+ *
+ * Profile Creation:
+ * - Profiles are auto-created via database trigger on user signup
+ * - If profile not found (PGRST116), retries once after 1 second
+ * - This handles the delay between user creation and trigger execution
+ *
+ * @example
+ * ```tsx
+ * function ProtectedPage() {
+ *   const { user, profile, hasPermission, loading } = useAuth();
+ *
+ *   if (loading) return <LoadingSpinner />;
+ *   if (!user) return <LoginPrompt />;
+ *   if (!hasPermission(['admin', 'super_admin'])) return <Unauthorized />;
+ *
+ *   return <AdminPanel profile={profile} />;
+ * }
+ * ```
+ *
+ * @see {@link https://supabase.com/docs/guides/auth} Supabase Auth Docs
+ */
+
 import { createContext, useContext, useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase/client';
 
+/**
+ * Available user roles in the system
+ * @remarks Roles are stored in user.raw_app_meta_data.role in JWT
+ */
 export type UserRole = 'super_admin' | 'admin' | 'kontributor';
 
+/**
+ * User profile from the profiles table
+ * @remarks Automatically created via trigger when user signs up
+ */
 export interface Profile {
   id: string;
   email: string;
@@ -16,20 +72,51 @@ export interface Profile {
   updated_at: string;
 }
 
+/**
+ * Authentication context shape
+ * @remarks All auth-related state and functions available throughout the app
+ */
 export interface AuthContextType {
+  /** Current authenticated user from Supabase Auth */
   user: User | null;
+  /** User profile from profiles table (includes role) */
   profile: Profile | null;
+  /** Current session with JWT token */
   session: Session | null;
+  /** Loading state during initial auth check and profile fetch */
   loading: boolean;
-  error: Error | null; // Added error state
+  /** Error state (e.g., profile fetch failures) */
+  error: Error | null;
+
+  /** Sign in with email and password */
   signIn: (email: string, password: string) => Promise<void>;
+  /** Sign out and clear all state */
   signOut: () => Promise<void>;
+
+  /**
+   * Check if user has one of the required roles
+   * @param requiredRoles - Array of roles, user needs at least one
+   * @returns true if user has permission, false otherwise
+   * @example hasPermission(['admin', 'super_admin'])
+   */
   hasPermission: (requiredRoles: UserRole[]) => boolean;
+
+  /** Can manage users (create, edit, delete) - super_admin only */
   canManageUsers: () => boolean;
+  /** Can manage members - super_admin and admin */
   canManageMembers: () => boolean;
+  /** Can manage leadership - super_admin and admin */
   canManageLeadership: () => boolean;
+  /** Can publish articles - super_admin and admin */
   canPublishArticles: () => boolean;
+  /**
+   * Check if user can edit their own content (kontributor rule)
+   * @param authorId - The author_id of the content to check
+   * @returns true if current user is the author
+   */
   canEditOwnContent: (authorId: string) => boolean;
+
+  /** Manually refresh user profile from database */
   refreshProfile: () => Promise<void>;
 }
 
@@ -40,22 +127,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
   const [profile, setProfile] = useState<Profile | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null); // Added error state
+  const [error, setError] = useState<Error | null>(null);
 
   // Track if we're currently fetching to prevent race conditions
   const isFetchingRef = useRef(false);
   const pendingFetchRef = useRef<string | null>(null);
   const initializedRef = useRef(false);
+  const hasSetLoadingFalseRef = useRef(false); // Prevent loading from bouncing
 
   useEffect(() => {
     let mounted = true;
 
     // Safety timeout: force loading to false after 10 seconds
-    // Safety timeout: force loading to false after 10 seconds
     const safetyTimeout = setTimeout(() => {
-      if (mounted && !initializedRef.current) {
+      if (mounted && !hasSetLoadingFalseRef.current) {
         console.warn('[AuthContext] Loading timeout - forcing loading to false');
         setLoading(false);
+        hasSetLoadingFalseRef.current = true;
         initializedRef.current = true;
       }
     }, 10000);
@@ -284,8 +372,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }): React
       // Don't throw - we want to complete initialization even if profile fetch fails
     } finally {
       isFetchingRef.current = false;
-      setLoading(false);
-      initializedRef.current = true;
+
+      // CRITICAL: Only set loading=false ONCE during initialization
+      // After that, loading state is permanent (never bounces back to true)
+      if (!hasSetLoadingFalseRef.current) {
+        setLoading(false);
+        hasSetLoadingFalseRef.current = true;
+        initializedRef.current = true;
+      }
 
       // Process pending fetch if any
       if (pendingFetchRef.current) {

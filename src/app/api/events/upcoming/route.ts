@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
+import { getUpcomingEvents } from '@/lib/api/events';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const repo = RepositoryFactory.getEventRepository();
-    const events = await repo.getUpcoming(3);
+    const events = await getUpcomingEvents(3);
 
     return NextResponse.json(events);
   } catch (error) {

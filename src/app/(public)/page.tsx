@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import { HeroSection } from '@/features/home/components/HeroSection';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
+import { HOME_CONTENT } from '@/config';
 
 const FeaturesSection = dynamic(() => import('@/features/home/components/FeaturesSection').then(mod => ({ default: mod.FeaturesSection })), {
   loading: () => <div className="h-96" />,
@@ -22,18 +22,15 @@ const CTASection = dynamic(() => import('@/features/home/components/CTASection')
   loading: () => <div className="h-64" />,
 });
 
-export default async function HomePage() {
-  const settingsRepo = RepositoryFactory.getSettingsRepository();
-  const homeSettings = await settingsRepo.getHomeSettings();
-
+export default function HomePage() {
   return (
     <>
-      <HeroSection data={homeSettings.hero} />
-      <FeaturesSection data={homeSettings.features} />
+      <HeroSection data={HOME_CONTENT.hero} />
+      <FeaturesSection data={HOME_CONTENT.features} />
       <StatsSection />
       <ArticlesPreview />
       <EventsPreview />
-      <CTASection data={homeSettings.cta} />
+      <CTASection data={HOME_CONTENT.cta} />
     </>
   );
 }

@@ -6,7 +6,7 @@ import { ArrowRight, Calendar, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
-import type { EventListItem } from '@/core/entities/Event';
+import type { Event as EventListItem } from '@/lib/api/events';
 
 export function EventsPreview() {
   const [events, setEvents] = useState<EventListItem[]>([]);

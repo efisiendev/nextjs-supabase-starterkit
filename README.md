@@ -1,291 +1,461 @@
-# HMJF UIN Alauddin Makassar - Website Kompro
+# Next.js + Supabase Starterkit
 
-Website resmi Himpunan Mahasiswa Jurusan Farmasi (HMJF) UIN Alauddin Makassar. Platform komprehensif untuk mengelola informasi organisasi, artikel, acara, anggota, dan kepengurusan.
+> **Production-ready starterkit** dengan Supabase Auth + RLS sudah configured, admin panel CRUD lengkap, dan komponen UI reusable. **Seperti Laravel Breeze untuk Next.js!**
 
-## ✨ Features
+[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
+[![Supabase](https://img.shields.io/badge/Supabase-Auth%20%2B%20RLS-green)](https://supabase.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3-38bdf8)](https://tailwindcss.com/)
 
-### Public Pages
-- 🏠 **Homepage** - Landing page dengan informasi organisasi
-- 📰 **Articles** - Sistem publikasi artikel dengan kategori (Post, Blog, Opinion, Publication, Info)
-- 📅 **Events** - Manajemen event dengan status (Upcoming, Ongoing, Completed, Cancelled)
-- 👥 **Members** - Database anggota dengan filter batch & status
-- 👔 **Leadership** - Struktur kepengurusan dengan divisi
+---
 
-### Admin Panel
-- 🔐 **Authentication** - JWT-based auth dengan role management (Super Admin, Admin, Kontributor)
-- 📝 **Article Management** - CRUD artikel dengan Markdown editor
-- 🎪 **Event Management** - CRUD event dengan kategori lengkap
-- 👨‍💼 **Leadership Management** - Manajemen struktur kepengurusan
-- 👤 **User Management** - Kelola user dan role assignment
-- 📊 **Dashboard** - Statistik dan overview data
+## ✨ Apa yang Sudah Termasuk
 
-### UI/UX Features
-- 🎨 **Modern Design** - Tailwind CSS dengan komponen reusable
-- 📱 **Fully Responsive** - Mobile-first design
-- ⚡ **Loading States** - Skeleton loaders untuk better UX
-- ❌ **Error Handling** - Dedicated error pages dengan retry functionality
-- 🔍 **Not Found Pages** - Custom 404 pages per route
-- ✍️ **Markdown Support** - Rich text editing dengan syntax highlighting
-- 🖼️ **Image Optimization** - Next.js Image component
-- 🌙 **Floating Dock** - Modern navigation component
+### 🔐 Supabase Auth + RLS (Sudah Configured!) ⭐
+- **JWT-based authentication** dengan Supabase
+- **3-tier role system:** super_admin, admin, kontributor
+- **RLS policies** di setiap table
+- **Helper functions** untuk permission checks (`is_admin()`, `is_super_admin()`)
+- **Auto-profile creation** via database trigger
+- **Race condition handling** di auth context
+- **Profile fetch retry logic** untuk database trigger delay
+- **Ini adalah bagian paling rumit - dan sudah selesai!**
 
-## 🛠️ Tech Stack
+### 🎨 Admin Panel CRUD Lengkap ⭐
+- ✅ **Articles management** (dengan TipTap markdown editor)
+- ✅ **Events management**
+- ✅ **Members management**
+- ✅ **Leadership management**
+- ✅ **Users management** (super_admin only)
+- ✅ **Site settings**
+- ✅ **Dashboard** dengan statistik
+- ✅ **Role-based access control**
+- ✅ **Consistent CRUD patterns** - mudah di-replicate
 
-### Frontend
-- **Framework**: Next.js 14 (App Router)
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **UI Components**: Custom components + Lucide Icons
-- **Markdown**: React Markdown + Turndown (HTML to MD conversion)
-- **Date Handling**: date-fns
-- **Notifications**: Sonner (toast notifications)
+### 📝 Rich Text Editor (Production Ready) ⭐
+- **TipTap integration** dengan Markdown support
+- **Image upload** capability
+- **Tables, links, code blocks**
+- **Preview mode**
+- **Siap pakai tanpa setup tambahan**
 
-### Backend & Database
-- **Database**: Supabase (PostgreSQL)
-- **ORM**: Supabase Client
-- **Authentication**: Supabase Auth (JWT)
-- **RLS**: Row Level Security dengan JWT claims
-- **Storage**: Supabase Storage (untuk images)
+### 🎭 UI Components Library ⭐
+**Animations:**
+- ParallaxHero - Parallax scrolling effect
+- TiltCard - 3D tilt on hover
+- SpotlightCard - Spotlight effect
+- ScrollReveal - Scroll-triggered animations
 
-### Architecture
-- **Pattern**: Clean Architecture
-- **Data Access**: Repository Pattern
-- **State Management**: React Context (Auth)
-- **Type Safety**: Full TypeScript coverage
+**Layouts:**
+- FloatingDock - Modern navigation dock
+- Header & Footer - Responsive layouts
+- MobileMenu - Off-canvas mobile navigation
 
-## 🚀 Getting Started
+**Content:**
+- MarkdownContent - Markdown renderer dengan syntax highlighting
+- Skeleton components - Loading states
+- Empty states & error boundaries
+
+### 🌐 Public Pages (Sudah Terintegrasi) ⭐
+- Homepage (hero, features, stats, CTA)
+- Articles listing & detail pages
+- Events listing & detail pages
+- Members directory
+- Leadership page
+- **Sudah include data fetching dari Supabase:**
+  - Client-side fetching examples
+  - Server-side fetching examples
+  - Repository pattern usage
+
+### 🏗️ Clean Architecture ⭐
+- **Repository pattern** untuk data access
+- **Factory pattern** untuk dependency injection
+- **Type-safe** di seluruh codebase
+- **Separation of concerns** yang jelas:
+  - `core/` - Domain layer (entities, interfaces)
+  - `infrastructure/` - Implementation layer (Supabase)
+  - `app/` - Presentation layer (React components)
+- **Easy to extend** untuk entity baru
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+
-- npm/yarn/pnpm
-- Supabase account
+- npm atau yarn
+- Akun Supabase (gratis di [supabase.com](https://supabase.com))
 
-### Installation
-
+### 1. Clone & Install
 ```bash
-# Clone repository
-git clone https://github.com/your-username/griyaflora_babulu.git
+git clone <repo-url>
 cd griyaflora_babulu
-
-# Install dependencies
 npm install
-
-# Copy environment variables
-cp .env.example .env.local
-
-# Edit .env.local dengan Supabase credentials kamu
 ```
 
-### Database Setup (Cloud-Based)
-
-> **Note**: Semua setup database dilakukan di Supabase Dashboard (cloud-based). Tidak perlu Supabase CLI lokal.
-
-1. **Create Supabase Project**
-   - Buat project baru di [Supabase](https://supabase.com)
-   - Copy **Project URL** dan **Anon Key** dari Settings → API
-
-2. **Run Migration di SQL Editor**
-   - Buka **SQL Editor** di Supabase Dashboard
-   - Copy isi file `supabase/migrations/20240122000000_initial_schema.sql`
-   - Paste dan **Run** di SQL Editor
-   - Tunggu hingga selesai (create tables, RLS policies, functions)
-
-3. **Seed Data Articles (Optional)**
-   - Di **SQL Editor**, copy isi file `supabase/seed-articles.sql`
-   - Paste dan **Run** untuk insert 82 artikel dari kemafar.org
-   - Proses memakan waktu ~30 detik
-
-4. **Create First Admin User**
-   - Signup melalui aplikasi (http://localhost:3000/admin/login)
-   - Di Supabase Dashboard → **Authentication** → **Users**
-   - Click user yang baru dibuat → Edit user
-   - Tambahkan di `raw_app_meta_data`:
-     ```json
-     {
-       "role": "super_admin"
-     }
-     ```
-   - Save → Logout → Login kembali
-
-### Environment Variables
-
-Update `.env.local`:
-
+### 2. Setup Environment
 ```bash
-# Site Configuration
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-NEXT_PUBLIC_SITE_NAME="HMJF UIN Alauddin"
+cp .env.example .env.local
+```
 
-# WhatsApp Configuration
-NEXT_PUBLIC_WHATSAPP_NUMBER=6281234567890
-
+Edit `.env.local` dengan credentials Supabase Anda:
+```env
 # Supabase Configuration
 NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 
-# Feature Flags (set to true setelah migration selesai)
-NEXT_PUBLIC_USE_SUPABASE_MEMBERS=true
-NEXT_PUBLIC_USE_SUPABASE_ARTICLES=true
-NEXT_PUBLIC_USE_SUPABASE_EVENTS=true
-NEXT_PUBLIC_USE_SUPABASE_LEADERSHIP=true
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+NEXT_PUBLIC_SITE_NAME="Your Organization"
+NEXT_PUBLIC_WHATSAPP_NUMBER=628123456789
 ```
 
-### Development
+### 3. Run Database Migration
+1. Buka **SQL Editor** di Supabase Dashboard
+2. Copy isi file `supabase/migrations/20240122000000_initial_schema.sql`
+3. Paste dan **Run**
 
+Migration ini akan create:
+- ✅ Tables (articles, events, members, leadership, profiles)
+- ✅ RLS policies untuk semua tables
+- ✅ Helper functions (`is_admin()`, `is_super_admin()`)
+- ✅ Trigger untuk auto-create profile
+
+### 4. Run Development Server
 ```bash
-# Run development server
 npm run dev
-
-# Build for production
-npm run build
-
-# Start production server
-npm start
-
-# Lint
-npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+Buka [http://localhost:3000](http://localhost:3000) 🎉
 
-## 📁 Project Structure
-
-```
-griyaflora_babulu/
-├── public/
-│   └── data/              # Legacy JSON data files
-├── src/
-│   ├── app/
-│   │   ├── (public)/      # Public pages (/, /articles, /events, dll)
-│   │   ├── admin/         # Admin panel routes
-│   │   └── api/           # API routes
-│   ├── core/
-│   │   ├── domain/        # Entities & interfaces
-│   │   └── repositories/  # Repository interfaces
-│   ├── infrastructure/
-│   │   └── repositories/  # Supabase implementations
-│   ├── lib/
-│   │   ├── auth/          # Authentication context & utils
-│   │   ├── supabase/      # Supabase client config
-│   │   └── constants.ts   # App constants
-│   └── shared/
-│       ├── components/    # Reusable UI components
-│       └── utils/         # Helper functions
-├── scripts/
-│   └── scrape-kemafar-articles.ts  # Web scraper untuk seed data
-└── supabase/
-    ├── migrations/        # Database migrations
-    └── seed-articles.sql  # Seed data artikel
-```
-
-## 🔐 User Roles & Permissions
-
-| Role | Permissions |
-|------|-------------|
-| **Super Admin** | Full access to everything, manage users & roles |
-| **Admin** | CRUD articles, events, leadership, members |
-| **Kontributor** | Create & edit own articles (draft/pending only) |
-
-## 📝 Content Management
-
-### Articles
-- **Markdown Editor**: WYSIWYG editor dengan preview
-- **Categories**: Post, Blog, Opinion, Publication, Info
-- **Status**: Draft, Pending, Published, Archived
-- **Features**: Cover image, tags, featured flag, view counter
-
-### Events
-- **Categories**: Seminar, Workshop, Community Service, Competition, Training, Other
-- **Status**: Upcoming, Ongoing, Completed, Cancelled
-- **Features**: Location (JSONB), registration URL, participant tracking
-
-### Leadership
-- **Positions**: Ketua, Wakil Ketua, Sekretaris, Bendahara, Coordinator, Member
-- **Divisions**: 8 divisions (Internal Affairs, External Affairs, Academic, dll)
-- **Period Management**: Start/end dates per leadership period
-
-## 🎨 Key Components
-
-### UI Components
-- `<MarkdownContent>` - Render Markdown dengan syntax highlighting
-- `<MarkdownEditor>` - WYSIWYG Markdown editor
-- `<FloatingDock>` - Modern navigation dock
-- `<ErrorState>` - Reusable error display dengan retry
-- `<Skeleton>` - Loading skeleton components
-- `Page Skeletons` - Dedicated skeletons per page type
-
-### Auth Components
-- `<AuthContext>` - Global auth state management
-- `<AdminLayout>` - Protected admin layout dengan sidebar
-- `<Sidebar>` - Admin navigation
-
-## 🌐 Deployment
-
-### Vercel (Recommended)
-
-1. Push ke GitHub
-2. Import project di [Vercel](https://vercel.com)
-3. Add environment variables
-4. Deploy!
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
-
-### Environment Variables di Production
-Pastikan set semua environment variables di deployment platform:
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `NEXT_PUBLIC_WHATSAPP_NUMBER`
-- Set all `NEXT_PUBLIC_USE_SUPABASE_*` to `true`
-
-## 🔧 Development Tools
-
-### Web Scraper
-Script untuk scrape artikel dari kemafar.org:
-
-```bash
-# Run scraper
-npx tsx scripts/scrape-kemafar-articles.ts
-
-# Output: supabase/seed-articles.sql
-```
-
-Features:
-- Scrape dari multiple categories
-- HTML to Markdown conversion (Turndown)
-- Automatic pagination handling
-- Rate limiting protection
-- Error handling & retry logic
-
-## 📚 Documentation
-
-- [Admin Panel Guide](docs/admin-panel-setup.md)
-- [Database Migration Guide](supabase/migrations/README.md)
-- [Transformation Plan](docs/TRANSFORMATION_PLAN.md) - Roadmap to multi-purpose starter template
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to branch (`git push origin feature/AmazingFeature`)
-5. Open Pull Request to `dev` branch
-
-**Branch Strategy:**
-- `main` - Production ready code
-- `dev` - Development branch (merge here first)
-- `feat/*` - Feature branches
-- `fix/*` - Bug fix branches
-
-## 📄 License
-
-© 2024 HMJF UIN Alauddin Makassar. All rights reserved.
-
-## 👥 Team
-
-Developed with ❤️ by HMJF UIN Alauddin Makassar Development Team
+### 5. Create First Admin
+1. Signup via [http://localhost:3000/auth/login](http://localhost:3000/auth/login)
+2. Di Supabase Dashboard → **Authentication** → **Users**
+3. Click user → Edit → Tambahkan di `raw_app_meta_data`:
+   ```json
+   {
+     "role": "super_admin"
+   }
+   ```
+4. Save → Logout → Login kembali
 
 ---
 
-**Tech Stack:** Next.js 14 • TypeScript • Tailwind CSS • Supabase • Vercel
+## 📚 Yang Anda Dapatkan
+
+### Auth System
+| Feature | Status | Description |
+|---------|--------|-------------|
+| JWT Auth | ✅ | Supabase Auth dengan JWT tokens |
+| 3 User Roles | ✅ | super_admin, admin, kontributor |
+| RLS Policies | ✅ | Row-level security di semua tables |
+| Protected Routes | ✅ | Middleware + client-side guards |
+| Permission Helpers | ✅ | `hasPermission()`, `canManageUsers()`, dll |
+| Race Condition Handling | ✅ | Queue-based profile fetching |
+| Profile Retry Logic | ✅ | Auto-retry jika trigger delay |
+
+### Admin Panel Features
+| Feature | super_admin | admin | kontributor |
+|---------|-------------|-------|-------------|
+| Dashboard | ✅ | ✅ | ✅ |
+| View Articles/Events | ✅ | ✅ | ✅ (own only) |
+| Create Articles/Events | ✅ | ✅ | ✅ |
+| Publish Articles/Events | ✅ | ✅ | ❌ |
+| Manage Members | ✅ | ✅ | ❌ |
+| Manage Leadership | ✅ | ✅ | ❌ |
+| Manage Users | ✅ | ❌ | ❌ |
+| Site Settings | ✅ | ✅ | ❌ |
+
+### Data Flow (Clean Architecture)
+```
+User Request
+    ↓
+Component (React)
+    ↓
+Repository Interface (core/repositories/)
+    ↓
+Repository Implementation (infrastructure/repositories/)
+    ↓
+Supabase Client
+    ↓
+PostgreSQL + RLS
+```
+
+### Permission Helpers Usage
+```typescript
+import { useAuth } from '@/lib/auth/AuthContext';
+
+function AdminPanel() {
+  const { hasPermission, canManageUsers, canPublishArticles } = useAuth();
+
+  // Check multiple roles
+  if (hasPermission(['admin', 'super_admin'])) {
+    // Allow action
+  }
+
+  // Check specific permission
+  if (canManageUsers()) {
+    // Super admin only
+  }
+
+  // Check content ownership
+  if (canEditOwnContent(article.author_id)) {
+    // Kontributor can edit own drafts
+  }
+}
+```
+
+---
+
+## 🎯 Kenapa Starterkit Ini?
+
+### ❌ Tanpa Starterkit Ini
+- ⏱️ **2-3 hari** setup Supabase Auth + RLS dari nol
+- 😰 Debugging RLS policies yang strict dan rumit
+- 🔁 Copy-paste CRUD patterns berkali-kali
+- 📚 Baca dokumentasi Supabase berulang kali
+- 🐛 Handle edge cases (race conditions, profile creation delay, token refresh)
+
+### ✅ Dengan Starterkit Ini
+- ⚡ **5 menit** clone → setup → run
+- 🎯 Auth + RLS sudah configured dengan benar
+- 📋 CRUD patterns jelas dan konsisten
+- 🚀 Langsung fokus ke fitur bisnis
+- 💪 Built-in best practices dan error handling
+- 📖 Dokumentasi lengkap inline (JSDoc)
+
+---
+
+## 🛠️ Tech Stack
+
+**Core:**
+- **Framework:** Next.js 14 (App Router)
+- **Database:** Supabase (PostgreSQL + Auth + RLS + Storage)
+- **Language:** TypeScript 5
+- **Styling:** Tailwind CSS 3
+
+**Libraries:**
+- **Editor:** TipTap (rich text + markdown)
+- **Animations:** Framer Motion
+- **Forms:** React Hook Form + Zod validation
+- **Notifications:** Sonner (toast)
+- **Icons:** Lucide React
+- **Date:** date-fns dengan locale Indonesia
+
+**Architecture:**
+- **Pattern:** Clean Architecture (Domain → Infrastructure → Presentation)
+- **Data Access:** Repository Pattern
+- **DI:** Factory Pattern
+- **State:** React Context (Auth)
+
+---
+
+## 📖 Documentation
+
+Dokumentasi lengkap tersedia di folder `docs/`:
+
+- **[SETUP.md](docs/SETUP.md)** - Setup guide detail step-by-step
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Penjelasan clean architecture
+- **[SUPABASE.md](docs/SUPABASE.md)** - Auth flow, RLS policies, data fetching
+- **[NEW_ENTITY.md](docs/NEW_ENTITY.md)** - Tutorial menambah entity baru
+
+---
+
+## 🏗️ Project Structure
+
+```
+├── config/                    # ⭐ Configuration files (easy to customize)
+│   ├── site.config.ts        # Site metadata, contact info
+│   ├── domain.config.ts      # Categories, divisions, business domain
+│   └── navigation.config.ts  # Routes definitions
+├── src/
+│   ├── app/                  # Next.js App Router
+│   │   ├── (public)/         # Public pages
+│   │   ├── admin/            # Admin panel pages
+│   │   └── api/              # API routes
+│   ├── core/                 # ⭐ Domain layer (clean architecture)
+│   │   ├── entities/         # Business entities (Article, Event, etc)
+│   │   ├── repositories/     # Repository interfaces
+│   │   └── factories/        # Factory pattern
+│   ├── infrastructure/       # ⭐ Infrastructure layer
+│   │   └── repositories/     # Supabase implementations
+│   ├── features/             # Feature-based components
+│   ├── shared/               # Shared/reusable components
+│   └── lib/
+│       ├── auth/             # ⭐ Auth context (fully documented)
+│       ├── supabase/         # Supabase client configs
+│       └── utils/            # Helper functions
+└── supabase/
+    └── migrations/           # ⭐ Database schema + RLS policies
+```
+
+---
+
+## 🎨 Customization
+
+### 1. Site Information (5 menit)
+Edit `config/site.config.ts`:
+```typescript
+export const SITE_CONFIG = {
+  name: 'Your Organization',
+  fullName: 'Your Organization Full Name',
+  email: 'contact@yoursite.com',
+  whatsappNumber: '628123456789',
+  instagram: '@yourorg',
+  address: 'Your Address',
+};
+```
+
+### 2. Categories & Divisions (5 menit)
+Edit `config/domain.config.ts`:
+```typescript
+export const ARTICLE_CATEGORIES = {
+  news: 'News',
+  tutorial: 'Tutorial',
+  announcement: 'Announcement',
+} as const;
+
+export const DIVISIONS = {
+  'tech': 'Technology',
+  'marketing': 'Marketing',
+  'finance': 'Finance',
+} as const;
+```
+
+### 3. Navigation Routes (2 menit)
+Edit `config/navigation.config.ts`:
+```typescript
+export const ROUTES = {
+  home: '/',
+  blog: '/blog',
+  products: '/products',
+  contact: '/contact',
+} as const;
+```
+
+### 4. Tambah Entity Baru (30-60 menit)
+Ikuti tutorial lengkap di **[docs/NEW_ENTITY.md](docs/NEW_ENTITY.md)**
+
+Contoh: Menambah entity **Products**
+1. Create migration untuk table `products`
+2. Create entity type `Product`
+3. Create interface `IProductRepository`
+4. Implement `SupabaseProductRepository`
+5. Add to `RepositoryFactory`
+6. Create admin CRUD pages
+7. Add RLS policies
+8. Create public pages
+
+---
+
+## 🚢 Deployment
+
+### Vercel (Recommended)
+```bash
+# Build locally first
+npm run build
+
+# Deploy
+vercel --prod
+```
+
+**Environment Variables:**
+Set di Vercel Dashboard → Project → Settings → Environment Variables:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `SUPABASE_SERVICE_ROLE_KEY`
+- `NEXT_PUBLIC_SITE_URL`
+- `NEXT_PUBLIC_WHATSAPP_NUMBER`
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+### Docker
+```dockerfile
+FROM node:18-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+```bash
+docker build -t my-app .
+docker run -p 3000:3000 --env-file .env.local my-app
+```
+
+---
+
+## 📝 Scripts
+
+```bash
+npm run dev          # Development server (http://localhost:3000)
+npm run build        # Production build
+npm run start        # Production server
+npm run lint         # ESLint check
+npm run type-check   # TypeScript check
+```
+
+---
+
+## 💡 Tips & Best Practices
+
+1. **Pelajari admin panel terlebih dahulu** - Semua CRUD patterns ada di sana
+2. **Copy pattern yang sudah ada** ketika menambah entity baru
+3. **Gunakan repository pattern** untuk semua data access (jangan langsung query Supabase)
+4. **Jangan bypass RLS** kecuali di API routes dengan service role key
+5. **Test permissions di setiap role** sebelum deploy production
+6. **Baca inline documentation** di AuthContext dan repository interfaces
+7. **Gunakan config files** di `config/` untuk customization cepat
+
+---
+
+## 🤝 Contributing
+
+Contributions welcome! Steps:
+
+1. Fork repository
+2. Create feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit changes: `git commit -m 'Add some AmazingFeature'`
+4. Push to branch: `git push origin feature/AmazingFeature`
+5. Open Pull Request
+
+**Branch Strategy:**
+- `main` - Production-ready code
+- `starterkit-refactor` - Current refactoring work
+- `feat/*` - Feature branches
+- `fix/*` - Bug fix branches
+
+Baca [CONTRIBUTING.md](CONTRIBUTING.md) untuk guidelines lengkap.
+
+---
+
+## 📄 License
+
+MIT License - Bebas digunakan untuk project komersial maupun personal.
+
+---
+
+## 🙋 Support & Community
+
+- **Issues:** [GitHub Issues](https://github.com/your-repo/issues)
+- **Discussions:** [GitHub Discussions](https://github.com/your-repo/discussions)
+- **Documentation:** [docs/](docs/)
+
+---
+
+## 🎓 Learning Resources
+
+- **Supabase Docs:** https://supabase.com/docs
+- **Next.js Docs:** https://nextjs.org/docs
+- **Clean Architecture:** https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+- **Repository Pattern:** https://martinfowler.com/eaaCatalog/repository.html
+
+---
+
+**Dibuat dengan ❤️ menggunakan Next.js + Supabase**
+
+**Ready untuk production. Clone, customize, deploy!** 🚀

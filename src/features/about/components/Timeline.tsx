@@ -14,7 +14,7 @@ interface TimelineItem {
 }
 
 interface TimelineProps {
-  items: TimelineItem[];
+  items: readonly TimelineItem[];
 }
 
 export function Timeline({ items }: TimelineProps) {

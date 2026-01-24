@@ -8,7 +8,7 @@
 import { Leaf, Users, GraduationCap, Heart, LucideIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Section } from '@/shared/components/ui/Section';
-import { HomeSettings } from '@/core/repositories/ISettingsRepository';
+import { HomeSettings } from '@/config';
 
 const iconMap: Record<string, LucideIcon> = {
   Leaf,

@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import { Calendar, MapPin } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { EventListItem } from '@/core/entities/Event';
-import { EVENT_CATEGORIES } from '@/lib/constants';
+import { Event as EventListItem } from '@/lib/api/events';
+import { EVENT_CATEGORIES } from '@/config';
 
 interface EventsGridProps {
   events: EventListItem[];

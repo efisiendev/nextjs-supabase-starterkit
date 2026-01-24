@@ -1,10 +1,9 @@
 import { Metadata } from 'next';
 import { z } from 'zod';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
+import { getEvents, getEventsByStatus, EventStatus } from '@/lib/api/events';
 import { EventsGrid } from '@/features/events/components/EventsGrid';
 import { SegmentedControl } from '@/shared/components/ui/SegmentedControl';
 import { EVENT_STATUS_COLORS, EVENT_STATUS_LABELS } from '@/lib/constants/event';
-import { EventStatus } from '@/core/entities/Event';
 
 // Zod schema for validating event status query parameter
 const EventStatusSchema = z.enum(['upcoming', 'ongoing', 'completed', 'cancelled']);
@@ -19,8 +18,6 @@ export default async function EventsPage({
 }: {
   searchParams: { status?: string };
 }) {
-  const eventRepo = RepositoryFactory.getEventRepository();
-
   // Validate and sanitize status parameter
   let validatedStatus: EventStatus | undefined;
   if (searchParams.status) {
@@ -32,8 +29,8 @@ export default async function EventsPage({
   }
 
   const events = validatedStatus
-    ? await eventRepo.getByStatus(validatedStatus)
-    : await eventRepo.getAll();
+    ? await getEventsByStatus(validatedStatus)
+    : await getEvents();
 
   return (
     <div className="min-h-screen bg-white">

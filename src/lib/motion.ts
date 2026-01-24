@@ -3,7 +3,7 @@
  * Centralized animation settings for better performance
  */
 
-import type { Transition, Variant, Variants } from 'framer-motion';
+import type { Transition, Variants } from 'framer-motion';
 
 // Optimized transition defaults
 export const TRANSITIONS = {

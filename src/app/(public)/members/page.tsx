@@ -1,10 +1,9 @@
 'use client';
 import Image from 'next/image';
 import { User } from 'lucide-react';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
+import { getActiveMembers, getMembers, type Member } from '@/lib/api/members';
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
-import type { MemberListItem } from '@/core/entities/Member';
 import { SegmentedControl } from '@/shared/components/ui/SegmentedControl';
 
 export default function MembersPage({
@@ -12,7 +11,7 @@ export default function MembersPage({
 }: {
   searchParams: { batch?: string; division?: string };
 }) {
-  const [members, setMembers] = useState<MemberListItem[]>([]);
+  const [members, setMembers] = useState<Member[]>([]);
   const [batches, setBatches] = useState<string[]>([]);
   const [_loading, setLoading] = useState(true);
   const { batch, division } = searchParams;
@@ -20,8 +19,7 @@ export default function MembersPage({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const memberRepo = RepositoryFactory.getMemberRepository();
-        let fetchedMembers = await memberRepo.getByStatus('active');
+        let fetchedMembers = await getActiveMembers();
 
         if (batch) {
           fetchedMembers = fetchedMembers.filter((m) => m.batch === batch);
@@ -31,7 +29,7 @@ export default function MembersPage({
         }
 
         // Get unique batches
-        const allMembers = await memberRepo.getAll();
+        const allMembers = await getMembers();
         const uniqueBatches = [...new Set(allMembers.map((m) => m.batch))].sort().reverse();
 
         setMembers(fetchedMembers);

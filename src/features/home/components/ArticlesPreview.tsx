@@ -6,8 +6,8 @@ import { ArrowRight, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useEffect, useState } from 'react';
-import type { ArticleListItem } from '@/core/entities/Article';
-import { ARTICLE_CATEGORIES } from '@/lib/constants';
+import type { Article as ArticleListItem } from '@/lib/api/articles';
+import { ARTICLE_CATEGORIES } from '@/config';
 
 export function ArticlesPreview() {
   const [articles, setArticles] = useState<ArticleListItem[]>([]);

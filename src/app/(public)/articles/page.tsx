@@ -1,11 +1,10 @@
 import { Metadata } from 'next';
 import { z } from 'zod';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
-import { ARTICLE_CATEGORIES } from '@/lib/constants';
+import { getPaginatedArticles, ArticleCategory } from '@/lib/api/articles';
+import { ARTICLE_CATEGORIES } from '@/config';
 import { ArticlesGrid } from '@/features/articles/components/ArticlesGrid';
 import { SegmentedControl } from '@/shared/components/ui/SegmentedControl';
 import { Pagination } from '@/shared/components/ui/Pagination';
-import { ArticleCategory } from '@/core/entities/Article';
 
 // Zod schema for validating article category query parameter
 const ArticleCategorySchema = z.enum(['post', 'blog', 'opinion', 'publication', 'info']);
@@ -22,8 +21,6 @@ export default async function ArticlesPage({
 }: {
   searchParams: { category?: string; page?: string };
 }) {
-  const articleRepo = RepositoryFactory.getArticleRepository();
-
   // Validate and sanitize category parameter
   let validatedCategory: ArticleCategory | undefined;
   if (searchParams.category) {
@@ -37,7 +34,7 @@ export default async function ArticlesPage({
   const currentPage = Math.max(1, parseInt(searchParams.page ?? '1', 10) || 1);
 
   // Fetch paginated articles
-  const result = await articleRepo.getPaginated(currentPage, ITEMS_PER_PAGE, validatedCategory);
+  const result = await getPaginatedArticles(currentPage, ITEMS_PER_PAGE, validatedCategory);
 
   return (
     <div className="min-h-screen bg-white">

@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
-import { ArticleListItem } from '@/core/entities/Article';
-import { ARTICLE_CATEGORIES } from '@/lib/constants';
+import { Article as ArticleListItem } from '@/lib/api/articles';
+import { ARTICLE_CATEGORIES } from '@/config';
 
 interface ArticlesGridProps {
   articles: ArticleListItem[];

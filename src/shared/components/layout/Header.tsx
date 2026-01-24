@@ -8,7 +8,7 @@
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { Menu, X, Leaf } from 'lucide-react';
-import { SITE_CONFIG, ROUTES } from '@/lib/constants';
+import { SITE_CONFIG, ROUTES } from '@/config';
 import { Navigation } from './Navigation';
 import { MobileMenu } from './MobileMenu';
 import { cn } from '@/shared/utils/cn';

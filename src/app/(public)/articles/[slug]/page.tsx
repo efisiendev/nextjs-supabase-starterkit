@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
-import { ARTICLE_CATEGORIES } from '@/lib/constants';
+import { getArticleBySlug, getArticlesByCategory } from '@/lib/api/articles';
+import { ARTICLE_CATEGORIES } from '@/config';
 import { MarkdownContent } from '@/shared/components/ui/MarkdownContent';
 import { Calendar, Tag, ArrowLeft, Eye } from 'lucide-react';
 import { format } from 'date-fns';
@@ -14,8 +14,7 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const articleRepo = RepositoryFactory.getArticleRepository();
-  const article = await articleRepo.getBySlug(params.slug);
+  const article = await getArticleBySlug(params.slug);
 
   if (!article) {
     return {
@@ -30,15 +29,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function ArticleDetailPage({ params }: Props) {
-  const articleRepo = RepositoryFactory.getArticleRepository();
-  const article = await articleRepo.getBySlug(params.slug);
+  const article = await getArticleBySlug(params.slug);
 
   if (!article) {
     notFound();
   }
 
   // Get related articles
-  const relatedArticles = await articleRepo.getByCategory(article.category);
+  const relatedArticles = await getArticlesByCategory(article.category);
   const filteredRelated = relatedArticles
     .filter((a) => a.id !== article.id)
     .slice(0, 3);

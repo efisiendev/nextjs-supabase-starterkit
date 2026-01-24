@@ -3,7 +3,7 @@
  * Centralized configuration for event status labels and colors
  */
 
-import { EventStatus } from '@/core/entities/Event';
+import { EventStatus } from '@/lib/api/events';
 
 /**
  * Event status color mappings (Tailwind CSS classes)

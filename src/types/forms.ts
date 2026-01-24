@@ -4,6 +4,11 @@
  */
 
 import { UserRole } from '@/lib/auth/AuthContext';
+import type {
+  MemberStatus,
+  ArticleStatus,
+  EventStatus,
+} from '@/lib/constants/admin';
 
 // User Forms
 export interface UserFormData {
@@ -44,7 +49,7 @@ export interface MemberFormData {
   phone: string;
   photo: string;
   batch: string;
-  status: 'active' | 'inactive' | 'alumni';
+  status: MemberStatus;
   division: string;
   position: string;
   joined_at: string;
@@ -67,7 +72,7 @@ export interface ArticleFormData {
   category: 'post' | 'blog' | 'opinion' | 'publication' | 'info';
   tags: string;
   featured: boolean;
-  status: 'draft' | 'pending' | 'published' | 'archived';
+  status: ArticleStatus;
 }
 
 // Event Forms
@@ -89,7 +94,7 @@ export interface EventFormData {
   registration_url: string;
   registration_deadline: string;
   max_participants: string;
-  status: 'upcoming' | 'ongoing' | 'completed' | 'cancelled';
+  status: EventStatus;
   tags: string;
   featured: boolean;
 }

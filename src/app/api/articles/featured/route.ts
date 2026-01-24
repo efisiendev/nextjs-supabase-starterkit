@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { RepositoryFactory } from '@/infrastructure/repositories/RepositoryFactory';
+import { getFeaturedArticles } from '@/lib/api/articles';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const repo = RepositoryFactory.getArticleRepository();
-    const articles = await repo.getFeatured(3);
+    const articles = await getFeaturedArticles(3);
 
     return NextResponse.json(articles);
   } catch (error) {
