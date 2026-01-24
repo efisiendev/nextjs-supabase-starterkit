@@ -65,17 +65,16 @@
 - **Sudah include data fetching dari Supabase:**
   - Client-side fetching examples
   - Server-side fetching examples
-  - Repository pattern usage
+  - Direct Supabase queries dengan type-safe
 
-### 🏗️ Clean Architecture ⭐
-- **Repository pattern** untuk data access
-- **Factory pattern** untuk dependency injection
+### 🏗️ Simplified Architecture ⭐
+- **Feature-based organization** untuk code clarity
+- **Direct Supabase queries** di lib/api layer
 - **Type-safe** di seluruh codebase
-- **Separation of concerns** yang jelas:
-  - `core/` - Domain layer (entities, interfaces)
-  - `infrastructure/` - Implementation layer (Supabase)
-  - `app/` - Presentation layer (React components)
-- **Easy to extend** untuk entity baru
+- **Straightforward data flow:**
+  - Component → lib/api → Supabase Client → PostgreSQL + RLS
+- **Consistent patterns** yang mudah di-copy untuk entity baru
+- **Focus on productivity** - simple dan langsung ke inti
 
 ---
 
@@ -167,19 +166,25 @@ Buka [http://localhost:3000](http://localhost:3000) 🎉
 | Manage Users | ✅ | ❌ | ❌ |
 | Site Settings | ✅ | ✅ | ❌ |
 
-### Data Flow (Clean Architecture)
+### Data Flow
 ```
 User Request
     ↓
 Component (React)
     ↓
-Repository Interface (core/repositories/)
-    ↓
-Repository Implementation (infrastructure/repositories/)
+lib/api functions (getArticles, getEvents, etc)
     ↓
 Supabase Client
     ↓
 PostgreSQL + RLS
+```
+
+**Contoh:**
+```typescript
+// Component
+import { getArticles } from '@/lib/api/articles';
+
+const articles = await getArticles(); // Simple & straightforward!
 ```
 
 ### Permission Helpers Usage
@@ -244,10 +249,10 @@ function AdminPanel() {
 - **Date:** date-fns dengan locale Indonesia
 
 **Architecture:**
-- **Pattern:** Clean Architecture (Domain → Infrastructure → Presentation)
-- **Data Access:** Repository Pattern
-- **DI:** Factory Pattern
+- **Pattern:** Feature-based organization
+- **Data Access:** Direct Supabase queries (lib/api layer)
 - **State:** React Context (Auth)
+- **Type Safety:** Full TypeScript coverage
 
 ---
 
@@ -256,7 +261,7 @@ function AdminPanel() {
 Dokumentasi lengkap tersedia di folder `docs/`:
 
 - **[SETUP.md](docs/SETUP.md)** - Setup guide detail step-by-step
-- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Penjelasan clean architecture
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** - Penjelasan struktur project & data flow
 - **[SUPABASE.md](docs/SUPABASE.md)** - Auth flow, RLS policies, data fetching
 - **[NEW_ENTITY.md](docs/NEW_ENTITY.md)** - Tutorial menambah entity baru
 
@@ -274,16 +279,18 @@ Dokumentasi lengkap tersedia di folder `docs/`:
 │   │   ├── (public)/         # Public pages
 │   │   ├── admin/            # Admin panel pages
 │   │   └── api/              # API routes
-│   ├── core/                 # ⭐ Domain layer (clean architecture)
-│   │   ├── entities/         # Business entities (Article, Event, etc)
-│   │   ├── repositories/     # Repository interfaces
-│   │   └── factories/        # Factory pattern
-│   ├── infrastructure/       # ⭐ Infrastructure layer
-│   │   └── repositories/     # Supabase implementations
 │   ├── features/             # Feature-based components
+│   │   ├── articles/         # Article-related components
+│   │   ├── events/           # Event-related components
+│   │   └── members/          # Member-related components
 │   ├── shared/               # Shared/reusable components
+│   │   ├── ui/               # UI components
+│   │   └── animations/       # Animation components
+│   ├── infrastructure/       # Infrastructure utilities
+│   │   └── validators/       # Validation schemas
 │   └── lib/
 │       ├── auth/             # ⭐ Auth context (fully documented)
+│       ├── api/              # ⭐ Data fetching functions (articles, events, etc)
 │       ├── supabase/         # Supabase client configs
 │       └── utils/            # Helper functions
 └── supabase/
@@ -338,14 +345,12 @@ export const ROUTES = {
 Ikuti tutorial lengkap di **[docs/NEW_ENTITY.md](docs/NEW_ENTITY.md)**
 
 Contoh: Menambah entity **Products**
-1. Create migration untuk table `products`
-2. Create entity type `Product`
-3. Create interface `IProductRepository`
-4. Implement `SupabaseProductRepository`
-5. Add to `RepositoryFactory`
-6. Create admin CRUD pages
-7. Add RLS policies
-8. Create public pages
+1. Create migration untuk table `products` dengan RLS policies
+2. Create TypeScript types untuk `Product`
+3. Create `lib/api/products.ts` dengan data fetching functions
+4. Create admin CRUD pages di `app/admin/products/`
+5. Create public pages di `app/(public)/products/`
+6. Copy patterns dari articles atau events - simple & straightforward!
 
 ---
 
@@ -405,10 +410,10 @@ npm run type-check   # TypeScript check
 
 1. **Pelajari admin panel terlebih dahulu** - Semua CRUD patterns ada di sana
 2. **Copy pattern yang sudah ada** ketika menambah entity baru
-3. **Gunakan repository pattern** untuk semua data access (jangan langsung query Supabase)
+3. **Gunakan lib/api functions** untuk semua data access - consistent & type-safe
 4. **Jangan bypass RLS** kecuali di API routes dengan service role key
 5. **Test permissions di setiap role** sebelum deploy production
-6. **Baca inline documentation** di AuthContext dan repository interfaces
+6. **Baca inline documentation** di AuthContext dan lib/api files
 7. **Gunakan config files** di `config/` untuk customization cepat
 
 ---
@@ -451,8 +456,9 @@ MIT License - Bebas digunakan untuk project komersial maupun personal.
 
 - **Supabase Docs:** https://supabase.com/docs
 - **Next.js Docs:** https://nextjs.org/docs
-- **Clean Architecture:** https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
-- **Repository Pattern:** https://martinfowler.com/eaaCatalog/repository.html
+- **Supabase Auth:** https://supabase.com/docs/guides/auth
+- **Row Level Security (RLS):** https://supabase.com/docs/guides/auth/row-level-security
+- **TypeScript Best Practices:** https://www.typescriptlang.org/docs/handbook/declaration-files/do-s-and-don-ts.html
 
 ---
 
