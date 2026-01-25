@@ -12,6 +12,11 @@ import { Member } from '@/types/member';
 import { ITEMS_PER_PAGE } from '@/lib/constants/admin';
 import { StatusBadge } from '@/shared/components/StatusBadge';
 
+// Constraint for query builder type
+interface QueryBuilder {
+  eq(column: string, value: string): this;
+}
+
 interface MemberListItem {
   id: string;
   name: string;
@@ -25,7 +30,7 @@ interface MemberListItem {
 
 export default function MembersPage() {
   const router = useRouter();
-  const { profile, hasPermission, loading: authLoading } = useAuth();
+  const { hasPermission, loading: authLoading } = useAuth();
   const [batches, setBatches] = useState<string[]>([]);
   const [batchFilter, setBatchFilter] = useState<string>('all');
 
@@ -64,7 +69,7 @@ export default function MembersPage() {
   const searchColumns = useMemo(() => ['name', 'nim', 'email'], []);
 
   // Memoize customFilter to prevent infinite re-renders
-  const customFilter = useCallback((query: any, filters: Record<string, string>) => {
+  const customFilter = useCallback(<Q extends QueryBuilder>(query: Q, filters: Record<string, string>): Q => {
     // Apply custom batch filter
     if (batchFilter !== 'all') {
       query = query.eq('batch', batchFilter);

@@ -252,7 +252,7 @@ export default function UsersPage() {
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-end gap-2">
                           <Link
-                            href={`/admin/users/${user.id}/edit`}
+                            href={`/admin/users/${user.id}`}
                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="Edit"
                           >

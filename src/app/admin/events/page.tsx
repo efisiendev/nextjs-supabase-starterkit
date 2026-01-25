@@ -186,7 +186,7 @@ export default function EventsPage() {
 
                           {canEditEvent(event) && (
                             <Link
-                              href={`/admin/events/${event.id}/edit`}
+                              href={`/admin/events/${event.id}`}
                               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               title="Edit"
                             >

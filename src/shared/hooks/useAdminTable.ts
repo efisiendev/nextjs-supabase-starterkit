@@ -16,6 +16,11 @@ import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/lib/auth/AuthContext';
 import { toast } from 'sonner';
 
+// Constraint for query builder type
+interface QueryBuilder {
+  eq(column: string, value: string): this;
+}
+
 interface UseAdminTableOptions<T> {
   /** Table name in Supabase */
   tableName: string;
@@ -33,8 +38,8 @@ interface UseAdminTableOptions<T> {
   authorColumn?: string;
   /** Search columns for OR search (e.g., ['title', 'author->>name']) */
   searchColumns?: string[];
-  /** Custom filter function */
-  customFilter?: (query: any, filters: Record<string, string>) => any;
+  /** Custom filter function - query type will be inferred */
+  customFilter?: <Q extends QueryBuilder>(query: Q, filters: Record<string, string>) => Q;
 }
 
 interface UseAdminTableResult<T> {
@@ -135,9 +140,9 @@ export function useAdminTable<T extends { id: string }>(
 
       setItems((data as T[]) || []);
       setTotalCount(count || 0);
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Error fetching ${tableName}:`, error);
-      toast.error(`Gagal memuat data: ${error.message}`);
+      toast.error(`Gagal memuat data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
     }
@@ -190,9 +195,9 @@ export function useAdminTable<T extends { id: string }>(
       } else {
         await fetchItems();
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error(`Error deleting ${tableName}:`, error);
-      toast.error(`Gagal menghapus data: ${error.message}`);
+      toast.error(`Gagal menghapus data: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
