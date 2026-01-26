@@ -10,7 +10,7 @@ interface UseAdminFormOptions<T> {
   id: string;
   initialData: T;
   redirectPath: string;
-  onBeforeSave?: (data: T) => any | Promise<any>;
+  onBeforeSave?: (data: T) => Record<string, unknown> | Promise<Record<string, unknown>>;
   permissions?: {
     canCreate?: () => boolean;
     canEdit?: (authorId: string) => boolean;
@@ -25,10 +25,10 @@ interface UseAdminFormResult<T> {
   isCreateMode: boolean;
   authorId: string;
   handleSubmit: (e: React.FormEvent) => Promise<void>;
-  updateField: (field: keyof T, value: any) => void;
+  updateField: (field: keyof T, value: T[keyof T]) => void;
 }
 
-export function useAdminForm<T extends Record<string, any>>({
+export function useAdminForm<T extends object>({
   tableName,
   selectColumns = '*',
   id,
@@ -72,7 +72,8 @@ export function useAdminForm<T extends Record<string, any>>({
       }
 
       // Check permissions for edit
-      const dataAuthorId = (data as any).author_id || (data as any).creator_id || '';
+      const record = data as Record<string, unknown>;
+      const dataAuthorId = (record.author_id ?? record.creator_id ?? '') as string;
       setAuthorId(dataAuthorId);
 
       if (permissions?.canEdit) {
@@ -114,11 +115,11 @@ export function useAdminForm<T extends Record<string, any>>({
     setLoading(true);
 
     try {
-      let dataToSave = { ...formData };
+      let dataToSave: Record<string, unknown> = { ...formData } as Record<string, unknown>;
 
       // Run pre-save hook
       if (onBeforeSave) {
-        dataToSave = await onBeforeSave(dataToSave);
+        dataToSave = await onBeforeSave(formData);
       }
 
       if (isCreateMode) {
@@ -151,7 +152,7 @@ export function useAdminForm<T extends Record<string, any>>({
     }
   }
 
-  function updateField(field: keyof T, value: any) {
+  function updateField(field: keyof T, value: T[keyof T]) {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }
 

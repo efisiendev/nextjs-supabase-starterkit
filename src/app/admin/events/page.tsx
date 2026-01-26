@@ -3,7 +3,6 @@
 import { useMemo, useCallback } from 'react';
 import { useAdminTable } from '@/shared/hooks/useAdminTable';
 import { useAuth } from '@/lib/auth/AuthContext';
-import { toast } from 'sonner';
 import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react';
 import Link from 'next/link';
 import { Event } from '@/types/event';
