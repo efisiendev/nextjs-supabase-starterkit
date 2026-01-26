@@ -197,7 +197,6 @@ export default function LeadershipFormPage() {
               type="url"
               value={formData.photo || ''}
               onChange={(value) => setFormData({ ...formData, photo: value })}
-              required
               placeholder="https://example.com/photo.jpg"
             />
           </div>
