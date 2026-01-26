@@ -53,7 +53,7 @@ export function CreateableSelect({
             >
                 {value.map((tag, index) => (
                     <span
-                        key={index}
+                        key={tag}
                         className="inline-flex items-center gap-1 px-2 py-1 text-sm bg-green-100 text-green-800 rounded-md animate-in fade-in zoom-in duration-200"
                     >
                         {tag}
